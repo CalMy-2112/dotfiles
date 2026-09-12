@@ -1,0 +1,16 @@
+[general]
+import = ["~/.config/alacritty/themes/themes/rose_pine.toml"]
+
+[window]
+dimensions = { columns = 204, lines = 54 }
+padding = { x = 8, y = 8 }
+opacity = 0.85
+blur = true
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font" }
+
+[keyboard]
+bindings = [
+  { key = "S", mods = "Command", chars = "\u0001sa" },
+]

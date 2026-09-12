@@ -1,0 +1,267 @@
+/*
+ * Rosé Pine (base/main variant) — https://rosepinetheme.com/palette/
+ * Adapted for hyprland/workspaces (was targeting sway/workspaces):
+ * Hyprland's module marks the current workspace with class .active, Sway's
+ * uses .focused. This file had been flipped to .focused for sway — flipped
+ * back to .active here so it highlights correctly under Hyprland. Also
+ * updated the .visible selector to exclude .active instead of .focused for
+ * the same reason. hyprland/workspaces does support .urgent same as sway's
+ * module, so that rule needed no change.
+ *
+ * Font: uses CaskaydiaCove Nerd Font (the Nerd Fonts patched build of
+ * Cascadia Code — can't keep the "Cascadia Code" name for licensing reasons,
+ * but it's the font you're asking for). You need the font file installed on
+ * the system for icons to render: on Fedora, `dnf search nerd-fonts` or grab
+ * it from the CascadiaCode release on the ryanoasis/nerd-fonts GitHub repo.
+ */
+@define-color base     #191724; /* window background */
+@define-color surface  #1f1d2e; /* module/pill background */
+@define-color overlay  #26233a; /* hover state */
+@define-color muted    #6e6a86;
+@define-color subtle   #908caa;
+@define-color text     #ffffff; /* pure white text, per request (Rosé Pine's stock text is #e0def4 if you ever want the softer off-white back) */
+@define-color love     #eb6f92; /* critical / red */
+@define-color gold     #f6c177; /* warning */
+@define-color rose     #ebbcba;
+@define-color pine     #31748f; /* Rosé Pine's "terminal green" */
+@define-color foam     #9ccfd8; /* accent / "terminal cyan" */
+@define-color iris     #c4a7e7; /* accent / focus highlight */
+@define-color hl_low   #21202e;
+@define-color hl_med   #403d52;
+@define-color hl_high  #524f67;
+
+/* Aliases so the rest of the file reads the same as before */
+@define-color bg   @base;
+@define-color pill @surface;
+@define-color fg   @text;
+@define-color ia1  @muted;
+
+* {
+  border: none;
+  padding: 0px;
+  font-family: 'CaskaydiaCove Nerd Font Propo', 'CaskaydiaCove Nerd Font', 'CaskaydiaCove Nerd Font Mono', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  color: @text;
+  min-height: 0;
+  transition: background-color .3s ease-out;
+  }
+
+
+/* --- Waybar ---*/
+window#waybar {
+  background-color: transparent;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#waybar > box {
+  border-radius: 0px;
+  border-bottom: 1px solid @hl_med;
+  margin: 0px;
+  background-color: @bg;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+  min-height: 15px;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+/* --- Modules --- */
+
+.modules-left {
+  border-radius: 3px;
+  border: 1px solid @hl_med;
+  margin: 1px 2px 2px 2px;
+  background-color: @pill;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+/* No border/background here on purpose: custom/mpris is often empty (nothing
+   playing), and this container doesn't shrink away just because its label
+   is blank. Styling it directly on #custom-mpris below instead means it only
+   gets a visible pill when there's actually text in it — no floating divider
+   when it's empty. */
+.modules-center {
+  margin: 0;
+}
+
+#right {
+margin-right: 2px;
+}
+
+/* --- Workspaces --- */
+
+button {
+  box-shadow: inset 0 -3px transparent;
+  border: none;
+  border-radius: 0;
+  transition: 0.3s ease-in-out;
+}
+
+button:hover {
+  background: inherit;
+}
+
+#workspaces {
+  background-color: @pill;
+  margin: 2px;
+  padding: 0px;
+  border-radius: 3px;
+}
+
+#workspaces button {
+  color: @subtle;
+  background-color: @pill;
+  padding: 0px 4px;
+  margin: 1px 1px;
+  border-radius: 2px;
+}
+
+/* hyprland/workspaces uses .active for the current workspace (sway uses .focused) */
+#workspaces button.active {
+  background-color: @iris;
+  color: @base;
+}
+
+/* shown on other outputs in a multi-monitor setup */
+#workspaces button.visible:not(.active) {
+  color: @foam;
+  opacity: 0.8;
+}
+
+#workspaces button.urgent {
+  background-color: @love;
+  color: @base;
+}
+
+#workspaces button:hover {
+  background-color: @overlay;
+  color: @text;
+  opacity: 1;
+}
+
+
+/* --- General Modules --- */
+
+#custom-mpris,
+#memory,
+#cpu,
+#battery,
+#network,
+#backlight,
+#bluetooth,
+#pulseaudio,
+#clock {
+  min-width: 14px;
+  padding-left: 3px;
+  padding-right: 3px;
+  margin: 0 2px 0 2px; 
+}
+
+#tray {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+
+#backlight {
+  padding-right: 0px;
+  padding-left: 6px;
+}
+
+#bluetooth {
+  padding-left: 0px;
+}
+
+#bluetooth,
+#custom-mpris,
+#memory,
+#cpu,
+#battery,
+#network,
+#backlight,
+#pulseaudio {
+  border-radius: 3px;
+  border: 1px solid @hl_med;
+  margin: 1px 2px 2px 2px;
+  padding: 0 6px;
+  background-color: @pill;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+#memory,
+#cpu {
+min-width: 45px;
+}
+
+tooltip {
+ padding: 4px;
+ background: @pill;
+ font-size: 10px;
+ border: 2px solid alpha(@fg, 0.2);
+ border-radius: 5px;
+}
+tooltip label {
+    color: @fg;
+    font-weight: bold;
+}
+
+#custom-separator {
+  opacity: 0.3;
+  color: @muted;
+  padding-top: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Specific Module */
+
+.hidden {
+  opacity: 0;
+}
+
+#custom-mpris {
+color: @fg;
+animation: repeat;
+	animation-name: blink;
+	animation-duration: 3s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes blink {
+    to {
+        color: @ia1;       
+    }
+}
+
+#battery.warning {
+  color: @gold;
+   background-color: @pill;
+}
+
+@keyframes blink2 {
+  to {
+    background-color: @pill;
+    color: @love;
+  }
+}
+
+#battery.critical:not(.charging) {
+  background-color: @pill;
+  color: @rose;
+  animation-name: blink2;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}

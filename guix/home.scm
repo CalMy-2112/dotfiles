@@ -211,8 +211,8 @@
     "rust" "rust:cargo" "rust-analyzer"   ;rustaceanvim
     "node"                   ;npm, for the servers above
     ;; molten-nvim and jupytext.nvim (Python host and Jupyter)
-    "python-pynvim" "python-jupyter-client" "python-nbformat"
-    "python-ipykernel" "python-jupytext"
+    "python-pynvim" "python-jupyter-client@7" "python-nbformat"
+    "python-ipykernel@6" "python-jupytext"
     ;; conjure + swank (your Lisp autocmd), metals (Scala)
     "sbcl" "openjdk"
 

@@ -2,9 +2,15 @@
 
 Files in this folder:
 
-- `config.scm`: the system (kernel, Wi-Fi firmware, disks, user, Bluetooth, JP keyboard).
-- `home.scm`: your programs and user services (Hyprland, Waybar, PipeWire...).
+- `config.scm`: the system (kernel, Wi-Fi firmware, disks, user, Bluetooth,
+  JP keyboard, tuigreet login screen, console font, zsh as login shell).
+- `home.scm`: your programs, user services and dotfiles (Hyprland, Waybar,
+  PipeWire, zsh + oh-my-zsh, tmux + oh-my-tmux, wallpaper, Neovim tools).
 - `channels.scm`: Guix + nonguix. Used only for the first install.
+
+home.scm also uses these files from the repository, if they are there:
+`zsh/.zshrc`, `tmux/.tmux.conf.local`, `wallpapers/bay.jpg` and the `nvim/`
+folder. Section F says what to put there.
 
 Change `YOU/DOTS` below to your GitHub repository. These steps expect this
 folder to be at `guix/` in that repository.
@@ -123,7 +129,6 @@ The install erases the internal disk.
    You can let it run, or stop it with Ctrl+C and run the same command again
    later.
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 4. Restart and remove the USB stick:
 
        reboot
@@ -131,14 +136,19 @@ The install erases the internal disk.
 
 ## E. First boot
 
-1. At the login prompt, log in as `root`. The password is empty.
-   Set the passwords, then log out:
+The tuigreet login screen shows on tty1. It starts Hyprland, and Hyprland is
+not installed until step 4. So do steps 1 to 4 on the text login on tty2.
+
+1. Press Ctrl+Alt+F2. At the login prompt, log in as `root`. The password is
+   empty. Set the passwords, then log out:
 
        passwd
        passwd osho
        exit
 
-2. Log in as `osho`. Wi-Fi now works:
+2. Log in as `osho` at the same prompt. Do not use `su osho`: with su,
+   NetworkManager (and later Hyprland) refuses, because you are not logged in
+   at the laptop. Wi-Fi now works:
 
        nmcli device wifi connect "NETWORK NAME" --ask
 
@@ -154,8 +164,10 @@ The install erases the internal disk.
        guix home reconfigure ~/dots/guix/home.scm
 
    This prints `home.scm: Hyprland 0.55.x (reads hyprland.lua)`.
-   Guix Home moves the old ~/.bash_profile and ~/.bashrc to a backup folder.
-   That is normal.
+   If a repository file from section F is missing, it prints
+   `... is not in the repository yet; skipped` and continues.
+   Guix Home moves old files that it replaces (for example ~/.config/nvim)
+   to a backup folder in your home. That is normal.
 
 5. Copy your configs to ~/.config. Change the paths to match your repository:
 
@@ -176,19 +188,79 @@ The install erases the internal disk.
        kb_layout  = "jp",
        kb_model   = "jp106",
 
-8. Cursor: Guix does not have phinger-cursors. Install it like on Debian:
+8. Cursor: Guix does not have phinger-cursors, so home.scm packages it and
+   sets XCURSOR_PATH. Nothing to download. GTK programs (LibreWolf,
+   pavucontrol, blueman) read the cursor from gsettings. Add these to the
+   autostart in hyprland.lua (use your XCURSOR_SIZE):
 
-       mkdir -p ~/.local/share/icons
-       guix shell curl -- curl -L -o /tmp/phinger.tar.bz2 https://github.com/phisch/phinger-cursors/releases/latest/download/phinger-cursors-variants.tar.bz2
-       tar -xjf /tmp/phinger.tar.bz2 -C ~/.local/share/icons
+       hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme \"phinger-cursors-dark\"")
+       hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 40")
 
-9. Log out (`exit`) and log in on tty1. Hyprland starts.
-   On tty2 (Ctrl+Alt+F2) you always get a text login. Use it if Hyprland
-   does not start.
+9. Log out (`exit`). Press Ctrl+Alt+F1 and log in at tuigreet. Hyprland
+   starts. On tty2 (Ctrl+Alt+F2) you always get a text login. Use it if
+   Hyprland does not start.
 
 10. Delete the installer's download folder:
 
         sudo rm -rf /var/cache/install
+
+
+## F. Login screen, zsh, tmux, wallpaper, Neovim
+
+Do this on a system that is already installed (or after section E).
+
+1. Put these files in the repository (the same layout as hypr/, waybar/...):
+
+       zsh/.zshrc               the new .zshrc (changed for Guix)
+       tmux/.tmux.conf.local    your .tmux.conf.local, no changes
+       wallpapers/bay.jpg       your wallpaper
+       nvim/                    already there
+
+   Do not add .tmux.conf: it is the oh-my-tmux file, and home.scm gets the
+   same version from GitHub. Then push.
+
+2. Apply the system part: tuigreet on tty1, the Terminus 16x32 console
+   font, zsh as login shell, less boot text:
+
+       sudo guix system reconfigure ~/dots/guix/config.scm
+
+3. Apply the home part: oh-my-zsh, plugins, oh-my-tmux, the wallpaper, the
+   Neovim link and tools:
+
+       guix home reconfigure ~/dots/guix/home.scm
+
+4. If tmux is running, stop it (`tmux kill-server`). Then reboot:
+
+       sudo reboot
+
+   tuigreet shows on tty1. If it does not work, press Ctrl+Alt+F2 and log
+   in there, or select the older system in the GRUB menu.
+
+5. Neovim tools that are not in Guix. pyright, bashls and ts_ls from
+   your lsp.lua come from npm (Node is in home.scm):
+
+       npm install -g --prefix ~/.local pyright bash-language-server typescript typescript-language-server
+
+   asm-lsp: `cargo install asm-lsp` (Rust is in home.scm).
+   nixd and hls are not set up: they are for Nix and Haskell.
+
+6. Swank for your Lisp autocmd (`ql:quickload :swank`) needs Quicklisp:
+
+       curl -o /tmp/quicklisp.lisp https://beta.quicklisp.org/quicklisp.lisp
+       sbcl --non-interactive --load /tmp/quicklisp.lisp \
+         --eval '(quicklisp-quickstart:install)' \
+         --eval '(ql-util:without-prompting (ql:add-to-init-file))'
+
+7. Metals (Scala): install coursier with its JVM launcher. The native
+   coursier binary does not run on Guix.
+
+       mkdir -p ~/.local/bin
+       curl -fL -o ~/.local/bin/cs https://raw.githubusercontent.com/coursier/launchers/master/coursier
+       chmod +x ~/.local/bin/cs
+       cs install metals
+
+8. In Neovim, run `:UpdateRemotePlugins` once (for molten-nvim), then restart
+   Neovim. Check the Python host with `:checkhealth provider`.
 
 
 ## Later
@@ -215,3 +287,8 @@ To find a program: `guix search NAME`. Add its name to home.scm and run
   installed. Find it with `guix search NAME` and add it to home.scm.
 - Japanese typing (not only the layout): Guix has fcitx5 with Anthy.
   Mozc is not in Guix.
+- No Plymouth boot splash. Guix has the Plymouth program, but no service
+  that runs it at boot, and the Guix initrd does not start it. config.scm
+  uses `quiet loglevel=3` to show less text instead.
+- oh-my-zsh does not update itself (the Guix copy is read-only). To update,
+  change the commit in home.scm.

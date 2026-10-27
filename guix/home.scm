@@ -14,9 +14,47 @@
              (gnu home services sound)     ;PipeWire
              (gnu packages)
              (gnu services)
+             (guix build-system copy)
+             (guix download)
              (guix gexp)
+             ((guix licenses) #:prefix license:)
              (guix packages)
              (guix utils))
+
+;; Phinger cursors are not in Guix, so this file packages them.
+;; Themes: phinger-cursors-dark, -light, -dark-left, -light-left.
+(define phinger-cursors
+  (package
+    (name "phinger-cursors")
+    (version "2.2")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://github.com/phisch/phinger-cursors"
+                                  "/releases/download/v" version
+                                  "/phinger-cursors-variants.tar.bz2"))
+              (sha256
+               (base32
+                "0mkfbafxskqw02kyn81j9zvhnywglysjg41klfnrrh9q1b1wzm26"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; The tarball has four theme folders and no top folder.
+          ;; Unpack it here, without going into a folder.
+          (replace 'unpack
+            (lambda* (#:key source #:allow-other-keys)
+              (invoke "tar" "xf" source))))
+      #:install-plan
+      #~'(("phinger-cursors-dark" "share/icons/")
+          ("phinger-cursors-light" "share/icons/")
+          ("phinger-cursors-dark-left" "share/icons/")
+          ("phinger-cursors-light-left" "share/icons/"))))
+    (home-page "https://github.com/phisch/phinger-cursors")
+    (synopsis "Phinger cursor theme")
+    (description
+     "Phinger is a cursor theme with dark, light and left-handed variants.")
+    (license license:cc-by-sa4.0)))
 
 (define %my-packages
   '(;; Hyprland and its tools
@@ -34,6 +72,8 @@
     "pipewire" "wireplumber" "pavucontrol"
     "brightnessctl" "playerctl"
     "network-manager-applet" "blueman" "bluez"
+    ;; USB drives mount by themselves (udiskie --notify in hyprland.lua)
+    "udiskie"
 
     ;; Programs
     "librewolf" "alacritty" "btop" "tmux" "neovim"
@@ -54,9 +94,15 @@
               " -- OLDER THAN 0.55, it does not read hyprland.lua")))
 
 (home-environment
- (packages (specifications->packages %my-packages))
+ (packages (cons phinger-cursors
+                 (specifications->packages %my-packages)))
  (services
   (list
+   ;; Where Hyprland and other programs look for cursor themes. Guix's
+   ;; default list does not include the Guix Home profile.
+   (simple-service 'cursor-path home-environment-variables-service-type
+                   '(("XCURSOR_PATH"
+                      . "$HOME/.local/share/icons:$HOME/.icons:$HOME/.guix-home/profile/share/icons:/run/current-system/profile/share/icons")))
    ;; Session D-Bus. PipeWire, the portals and notifications need it.
    (service home-dbus-service-type)
    ;; PipeWire + WirePlumber, with PulseAudio support (Waybar sound module).

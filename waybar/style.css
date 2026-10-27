@@ -39,8 +39,8 @@
 * {
   border: none;
   padding: 0px;
-  font-family: 'CaskaydiaCove Nerd Font Propo', 'CaskaydiaCove Nerd Font', 'CaskaydiaCove Nerd Font Mono', monospace;
-  font-size: 12px;
+  font-family: 'JetBrains Propo Nerd Font', 'JetBrains Nerd Font', 'JetBrains Mono Nerd Font', monospace;
+  font-size: 15px;
   font-weight: bold;
   color: @text;
   min-height: 0;
@@ -265,3 +265,47 @@ animation: repeat;
   animation-iteration-count: infinite;
   animation-direction: alternate;
 }
+
+/* quick-settings BEGIN (added by quick-settings.sh, "revert" removes it) */
+/* Tray menus (Steam and other apps). The "*" rule in this file makes all
+   text white, but the menu background comes from the GTK theme, which is
+   light. These rules give the menus a dark background. Rose Pine colors. */
+menu {
+  background-color: #191724;
+  border: 1px solid #403d52;
+  padding: 4px 0;
+}
+menu menuitem {
+  background-color: transparent;
+  padding: 4px 12px;
+}
+menu menuitem label {
+  color: #e0def4;
+}
+menu menuitem:hover {
+  background-color: #26233a;
+}
+menu menuitem:disabled label {
+  color: #6e6a86;
+}
+menu separator {
+  background-color: #403d52;
+  min-height: 1px;
+  margin: 4px 0;
+}
+menu check,
+menu radio,
+menu arrow {
+  color: #e0def4;
+}
+
+/* Night light and quick settings modules */
+#custom-nightlight,
+#custom-quicksettings {
+  padding: 0 8px;
+}
+#custom-nightlight.on,
+#custom-nightlight.auto {
+  color: #f6c177;
+}
+/* quick-settings END */

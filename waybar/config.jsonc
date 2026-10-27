@@ -27,7 +27,9 @@
     "pulseaudio",
     "battery",
     "memory",
-    "cpu"
+    "cpu",
+    "custom/nightlight",
+    "custom/quicksettings"
   ]
   },
 
@@ -38,6 +40,34 @@
     "format": "|", 
     "tooltip": false
 },
+  "custom/nightlight": {
+    "exec": "$HOME/.local/bin/nightlight waybar",
+    "return-type": "json",
+    "interval": 60,
+    "signal": 8,
+    "on-click": "$HOME/.local/bin/nightlight toggle",
+    "on-click-right": "$HOME/.local/bin/nightlight auto"
+  },
+  "custom/quicksettings": {
+    "format": "{icon}",
+    "format-icons": {
+      "none": "\uf1de",
+      "notification": "\uf0f3",
+      "inhibited-none": "\uf1de",
+      "inhibited-notification": "\uf0f3",
+      "dnd-none": "\uf1f6",
+      "dnd-notification": "\uf1f6",
+      "dnd-inhibited-none": "\uf1f6",
+      "dnd-inhibited-notification": "\uf1f6"
+    },
+    "return-type": "json",
+    "exec-if": "command -v swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true,
+    "tooltip": false
+  },
   "cpu": {
     "interval": 2,
     "format": " {icon} {usage}%",

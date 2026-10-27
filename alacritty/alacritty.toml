@@ -3,13 +3,14 @@ import = ["~/.config/alacritty/themes/themes/rose_pine.toml"]
 
 [window]
 dimensions = { columns = 204, lines = 54 }
+decorations = "None"
 padding = { x = 8, y = 8 }
 opacity = 0.85
 blur = true
 
 [font]
 normal = { family = "JetBrainsMono Nerd Font" }
-
+size = 12
 [keyboard]
 bindings = [
   { key = "S", mods = "Command", chars = "\u0001sa" },

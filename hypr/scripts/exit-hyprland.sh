@@ -5,5 +5,5 @@
 choice=$(printf "Yes, exit Hyprland\nCancel" | fuzzel --dmenu --prompt "Exit Hyprland? ")
 
 if [[ "$choice" == "Yes, exit Hyprland" ]]; then
-    hyprctl dispatch exit
+    hyprctl dispatch 'hl.dsp.exit()'
 fi

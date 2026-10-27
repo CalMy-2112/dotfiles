@@ -94,6 +94,7 @@ The install erases the internal disk.
 1. Get your files:
 
        guix shell git -- git clone https://github.com/YOU/DOTS /mnt/root/dots
+       mkdir -p /mnt/etc
        cp /mnt/root/dots/guix/config.scm /mnt/etc/config.scm
 
 2. Trust the nonguix build server, so that the kernel and firmware download
@@ -122,6 +123,7 @@ The install erases the internal disk.
    You can let it run, or stop it with Ctrl+C and run the same command again
    later.
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 4. Restart and remove the USB stick:
 
        reboot

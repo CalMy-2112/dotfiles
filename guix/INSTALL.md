@@ -3,7 +3,9 @@
 Files in this folder:
 
 - `config.scm`: the system (kernel, Wi-Fi firmware, disks, user, Bluetooth,
-  JP keyboard, tuigreet login screen, console font, zsh as login shell).
+  JP keyboard, tuigreet login screen, console font, zsh as login shell,
+  circular scrolling).
+- `circscroll.c`: the circular-scrolling program. config.scm builds it.
 - `home.scm`: your programs, user services and dotfiles (Hyprland, Waybar,
   PipeWire, zsh + oh-my-zsh, tmux + oh-my-tmux, wallpaper, Neovim tools).
 - `channels.scm`: Guix + nonguix. Used only for the first install.
@@ -101,7 +103,9 @@ The install erases the internal disk.
 
        guix shell git -- git clone https://github.com/YOU/DOTS /mnt/root/dots
        mkdir -p /mnt/etc
-       cp /mnt/root/dots/guix/config.scm /mnt/etc/config.scm
+       cp /mnt/root/dots/guix/config.scm /mnt/root/dots/guix/circscroll.c /mnt/etc/
+
+   config.scm needs circscroll.c in the same folder.
 
 2. Trust the nonguix build server, so that the kernel and firmware download
    ready-built:
@@ -263,6 +267,49 @@ Do this on a system that is already installed (or after section E).
    Neovim. Check the Python host with `:checkhealth provider`.
 
 
+## G. Circular scrolling on the round touchpad
+
+Put one finger on the rim of the pad and move it in a circle. Clockwise
+scrolls down. This works like the Synaptics driver on Debian, with the same
+ring (edges 1770, 5220, 1670, 4260) and speed (0.1 radian per step).
+
+libinput, which Hyprland uses, has no circular scrolling for this pad. So
+the `circscroll` service (circscroll.c) takes the real touchpad, makes a
+virtual copy for Hyprland, and turns circles on the ring into scroll-wheel
+events. A touch on the ring that moves inward, or a short tap, still goes to
+Hyprland as normal, so the pointer and tap-to-click work there too. If
+circscroll stops, the real touchpad works as before.
+
+1. Apply it:
+
+       sudo guix system reconfigure ~/dots/guix/config.scm
+
+   The service starts at once. You do not have to restart Hyprland.
+
+2. Check it:
+
+       sudo herd status circscroll
+       sudo tail /var/log/circscroll.log
+
+   The log must show `found "SynPS/2 Synaptics TouchPad"` and
+   `virtual touchpad /dev/input/...`. If it shows `not found`, find the
+   touchpad name with `grep Name /proc/bus/input/devices` and tell me.
+
+3. To change the ring: stop the service, then let circscroll show where
+   your touches land (Ctrl+C to stop), then start the service again:
+
+       sudo herd stop circscroll
+       sudo circscroll --print
+       sudo herd start circscroll
+
+   `--print` shows `RING` or `inside` for each touch. To try other values,
+   run for example `sudo circscroll --edges 2000,4990,1840,4090 --verbose`
+   (a wider ring) or `--step 0.15` (slower) while the service is stopped.
+   When values feel right, add them in config.scm (see the comment above
+   `%circscroll-service`) and reconfigure. `circscroll --help` lists all
+   options.
+
+
 ## Later
 
     guix pull                                         # get new package versions
@@ -281,8 +328,11 @@ To find a program: `guix search NAME`. Add its name to home.scm and run
 - Hyprland is 0.55.4. If your config uses an option that is new in 0.56,
   Hyprland shows an error at the top of the screen. The rest of the config
   still works.
-- Circular scrolling on the round touchpad does not work in Hyprland
-  (libinput does not support it for this model). Two-finger scroll works.
+- Circular scrolling comes from the circscroll service (section G), not from
+  the touchpad driver. Two-finger scroll also works.
+- hyprpaper runs through a small wrapper in home.scm (hyprpaper-with-mesa).
+  Guix links hyprtoolkit to libglvnd's EGL, which has no driver on Guix, so
+  hyprpaper alone stops with "eglGetProcAddress(eglCreateImageKHR) failed".
 - If a key or a Waybar button does nothing, the program is probably not
   installed. Find it with `guix search NAME` and add it to home.scm.
 - Japanese typing (not only the layout): Guix has fcitx5 with Anthy.

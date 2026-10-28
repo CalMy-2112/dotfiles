@@ -21,11 +21,15 @@
              (gnu home services sound)     ;PipeWire
              (gnu packages)
              ((gnu packages base) #:select (glibc))
+             ((gnu packages bash) #:select (bash-minimal))
              ((gnu packages elf) #:select (patchelf))
              ((gnu packages gcc) #:select (gcc))
+             ((gnu packages gl) #:select (mesa))
              ((gnu packages python) #:select (python))
+             ((gnu packages xdisorg) #:select (hyprpaper))
              (gnu services)
              (guix build-system copy)
+             (guix build-system trivial)
              (guix download)
              (guix gexp)
              (guix git-download)
@@ -171,13 +175,53 @@
     (description "This package provides the @command{tree-sitter} command.")
     (license license:expat)))
 
+;; hyprpaper 0.8 draws with hyprtoolkit. Guix links hyprtoolkit to the libEGL
+;; of libglvnd, but Guix's mesa is built without libglvnd, so that libEGL has
+;; no driver and hyprpaper stops with
+;;   CRIT from hyprtoolkit ]: [GL] eglGetProcAddress(eglCreateImageKHR) failed
+;; Hyprland and hyprlock use mesa's libEGL directly, so they work.
+;; This "hyprpaper" command loads mesa's EGL and GLES first, then starts the
+;; real hyprpaper. Nothing is compiled. Remove it when Guix fixes hyprtoolkit.
+(define hyprpaper-with-mesa
+  (package
+    (name "hyprpaper-with-mesa")
+    (version (package-version hyprpaper))
+    (source #f)
+    (build-system trivial-build-system)
+    (arguments
+     (list
+      #:modules '((guix build utils))
+      #:builder
+      #~(begin
+          (use-modules (guix build utils))
+          (let* ((bin    (string-append #$output "/bin"))
+                 (script (string-append bin "/hyprpaper")))
+            (mkdir-p bin)
+            (call-with-output-file script
+              (lambda (port)
+                (format port "#!~a
+export LD_PRELOAD=\"~a ~a${LD_PRELOAD:+ $LD_PRELOAD}\"
+exec ~a \"$@\"~%"
+                        #$(file-append bash-minimal "/bin/sh")
+                        #$(file-append mesa "/lib/libEGL.so.1")
+                        #$(file-append mesa "/lib/libGLESv2.so.2")
+                        #$(file-append hyprpaper "/bin/hyprpaper"))))
+            (chmod script #o755)))))
+    (home-page (package-home-page hyprpaper))
+    (synopsis "Hyprpaper, started with Mesa's EGL")
+    (description
+     "This package provides a @command{hyprpaper} command that loads Mesa's
+EGL and GLES libraries first, then starts Hyprpaper.")
+    (license (package-license hyprpaper))))
+
 ;;;
 ;;; Programs
 ;;;
 
 (define %my-packages
   '(;; Hyprland and its tools
-    "hyprland" "hyprlock" "hypridle" "hyprpaper" "hyprsunset"
+    ;; hyprpaper: see hyprpaper-with-mesa above (added below, in packages)
+    "hyprland" "hyprlock" "hypridle" "hyprsunset"
     "hyprpolkitagent"
     "xdg-desktop-portal" "xdg-desktop-portal-hyprland" "xdg-desktop-portal-gtk"
     "waybar" "fuzzel" "swaynotificationcenter" "libnotify"
@@ -201,6 +245,7 @@
     ;; zsh: plugins, and the programs that your aliases use
     "zsh-autosuggestions" "zsh-syntax-highlighting"
     "eza" "bat" "gdb"
+    "ncurses" "perl"   ;clear, tput (zshrc, oh-my-tmux); perl (oh-my-tmux)
 
     ;; Neovim (LazyVim): search, build tools for treesitter parsers
     "ripgrep" "fd" "gcc-toolchain" "make" "unzip"
@@ -253,6 +298,7 @@
  (packages (cons* phinger-cursors
                   tree-sitter-cli-bin
                   python
+                  hyprpaper-with-mesa
                   (specifications->packages %my-packages)))
  (services
   (list

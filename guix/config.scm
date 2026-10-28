@@ -8,16 +8,20 @@
 ;; Programs for your user are in home.scm, not here.
 
 (use-modules (gnu)
+             (guix build-system gnu)            ;circscroll
              (guix channels)
+             ((guix licenses) #:prefix license:)
+             (guix packages)
              (srfi srfi-1)                      ;remove
              ((gnu packages admin) #:select (tuigreet))
              ((gnu packages fonts) #:select (font-terminus))
              ((gnu packages linux) #:select (brightnessctl))
              ((gnu packages shells) #:select (zsh))
              ((gnu packages xdisorg) #:select (hyprlock))
+             ((gnu packages xorg) #:select (libevdev))
              (nongnu packages linux)            ;full kernel and firmware
              (nongnu system linux-initrd))      ;CPU microcode
-(use-service-modules desktop xorg)
+(use-service-modules desktop shepherd xorg)
 
 ;; nonguix: the full Linux kernel and the firmware for the Intel 8260
 ;; Wi-Fi and Bluetooth. The same lines are in channels.scm.
@@ -82,6 +86,61 @@
          (cons tty (file-append font-terminus "/share/consolefonts/ter-132n")))
        '("tty1" "tty2" "tty3" "tty4" "tty5" "tty6")))
 
+;; Circular scrolling on the round touchpad: move one finger around the rim
+;; (like the Synaptics driver on Debian). libinput, which Hyprland uses, has
+;; no circular scrolling for this pad, so circscroll.c (in this folder) does
+;; it between the touchpad and libinput. It works with any compositor.
+(define circscroll
+  (package
+    (name "circscroll")
+    (version "0.1")
+    (source (local-file "circscroll.c"))
+    (build-system gnu-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'unpack
+            (lambda* (#:key source #:allow-other-keys)
+              (copy-file source "circscroll.c")))
+          (delete 'configure)
+          (replace 'build
+            (lambda* (#:key inputs #:allow-other-keys)
+              (invoke "gcc" "-O2" "-Wall" "-o" "circscroll" "circscroll.c"
+                      (string-append
+                       "-I" (search-input-directory inputs
+                                                    "include/libevdev-1.0"))
+                      "-levdev" "-lm")))
+          (replace 'install
+            (lambda _
+              (install-file "circscroll" (string-append #$output "/bin")))))))
+    (inputs (list libevdev))
+    (home-page "https://github.com/CalMy-2112/dotfiles")
+    (synopsis "Circular scrolling for round touchpads")
+    (description
+     "circscroll turns a finger that moves around the rim of a round
+touchpad into scroll-wheel events, for any Wayland compositor.")
+    (license license:expat)))
+
+;; The service runs as root at boot and restarts if it stops. Its messages
+;; go to /var/log/circscroll.log. To change the ring or the speed, add
+;; options after the program name, for example
+;;   (list #$(file-append circscroll "/bin/circscroll") "--step" "0.15")
+;; ("circscroll --help" lists them), then reconfigure.
+(define %circscroll-service
+  (simple-service
+   'circscroll shepherd-root-service-type
+   (list (shepherd-service
+          (provision '(circscroll))
+          (requirement '(udev))
+          (documentation "Circular scrolling on the round touchpad.")
+          (start #~(make-forkexec-constructor
+                    (list #$(file-append circscroll "/bin/circscroll"))
+                    #:log-file "/var/log/circscroll.log"))
+          (stop #~(make-kill-destructor))
+          (respawn? #t)))))
+
 ;; tuigreet uses tty1, so remove the text login on tty1.
 ;; tty2 to tty6 keep the normal text login (Ctrl+Alt+F2).
 (define (tty1-login? service)
@@ -125,7 +184,8 @@
                 (supplementary-groups '("wheel" "netdev" "audio" "video")))
                %base-user-accounts))
 
-  (packages %base-packages)
+  ;; circscroll is here too, so you can run "sudo circscroll --print".
+  (packages (cons circscroll %base-packages))
 
   (services
    (cons*
@@ -154,6 +214,9 @@
 
     ;; Brightness keys without sudo (you are in the "video" group).
     (udev-rules-service 'brightnessctl brightnessctl)
+
+    ;; Circular scrolling on the round touchpad (see circscroll above).
+    %circscroll-service
 
     ;; %desktop-services: NetworkManager, elogind, D-Bus, polkit, udisks...
     (remove tty1-login?

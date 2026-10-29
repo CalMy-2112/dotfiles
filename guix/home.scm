@@ -239,7 +239,7 @@ EGL and GLES libraries first, then starts Hyprpaper.")
     "udiskie"
 
     ;; Programs
-    "librewolf" "alacritty" "btop" "tmux" "neovim"
+    "firefox" "bitwarden-desktop" "alacritty" "btop" "tmux" "neovim"
     "yazi" "fastfetch" "git" "curl" "wget"
 
     ;; zsh: plugins, and the programs that your aliases use
@@ -263,7 +263,7 @@ EGL and GLES libraries first, then starts Hyprpaper.")
 
     ;; Fonts and icons. Noto Sans CJK shows Japanese text.
     "font-nerd-jetbrains-mono" "font-google-noto" "font-google-noto-emoji"
-    "font-google-noto-sans-cjk" "adwaita-icon-theme" "hicolor-icon-theme"))
+    "font-google-noto-sans-cjk" "adwaita-icon-theme" "hicolor-icon-theme" "gnome-themes-extra"))
 
 ;; Your hyprland.lua needs Hyprland 0.55 or later. Print the version.
 (let ((version (package-version (specification->package "hyprland"))))

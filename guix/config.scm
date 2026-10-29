@@ -20,7 +20,8 @@
              ((gnu packages xdisorg) #:select (hyprlock))
              ((gnu packages xorg) #:select (libevdev))
              (nongnu packages linux)            ;full kernel and firmware
-             (nongnu system linux-initrd))      ;CPU microcode
+             (nongnu system linux-initrd)       ;CPU microcode
+             (btv tailscale))                   ;tailscale channel
 (use-service-modules desktop shepherd xorg)
 
 ;; nonguix: the full Linux kernel and the firmware for the Intel 8260
@@ -34,6 +35,20 @@
      "897c1a470da759236cc11798f4e0a5f7d4d59fbc"
      (openpgp-fingerprint
       "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5")))))
+
+;; Tailscale (tailscale and tailscaled, and tailscale-service-type).
+;; Guix itself has no Tailscale package. The same lines are in
+;; channels.scm. There is no build server: Guix builds it from source.
+(define %tailscale-channel
+  (channel
+   (name 'tailscale)
+   (url "https://github.com/umanwizard/guix-tailscale")
+   (branch "main")
+   (introduction
+    (make-channel-introduction
+     "52e82318f282c555757ef077d93a685fda97565d"
+     (openpgp-fingerprint
+      "9E53FC33B8328C745E7B31F70226C10D7877B741")))))
 
 ;; Signing key of the nonguix build server. It must be the same as
 ;; https://substitutes.nonguix.org/signing-key.pub
@@ -185,7 +200,8 @@ touchpad into scroll-wheel events, for any Wayland compositor.")
                %base-user-accounts))
 
   ;; circscroll is here too, so you can run "sudo circscroll --print".
-  (packages (cons circscroll %base-packages))
+  ;; tailscale: the "tailscale" command (the service only runs tailscaled).
+  (packages (cons* circscroll tailscale %base-packages))
 
   (services
    (cons*
@@ -218,6 +234,10 @@ touchpad into scroll-wheel events, for any Wayland compositor.")
     ;; Circular scrolling on the round touchpad (see circscroll above).
     %circscroll-service
 
+    ;; Tailscale daemon (Shepherd service "tailscaled"). State is in
+    ;; /var/lib/tailscale. Log in once with: sudo tailscale up
+    (service tailscale-service-type)
+
     ;; %desktop-services: NetworkManager, elogind, D-Bus, polkit, udisks...
     (remove tty1-login?
             (modify-services %desktop-services
@@ -227,9 +247,12 @@ touchpad into scroll-wheel events, for any Wayland compositor.")
               (guix-service-type
                config => (guix-configuration
                           (inherit config)
-                          ;; Write nonguix into /etc/guix/channels.scm, so
-                          ;; that a plain "guix pull" gets it.
-                          (channels (cons %nonguix-channel %default-channels))
+                          ;; Write nonguix and tailscale into
+                          ;; /etc/guix/channels.scm, so that a plain
+                          ;; "guix pull" gets them.
+                          (channels (cons* %tailscale-channel
+                                           %nonguix-channel
+                                           %default-channels))
                           ;; Download the kernel and firmware already built.
                           (substitute-urls
                            (append (guix-configuration-substitute-urls config)

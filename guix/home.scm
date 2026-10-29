@@ -240,7 +240,7 @@ EGL and GLES libraries first, then starts Hyprpaper.")
 
     ;; Programs
     "firefox" "bitwarden-desktop" "alacritty" "btop" "tmux" "neovim"
-    "yazi" "fastfetch" "git" "curl" "wget"
+    "yazi" "fastfetch" "git" "curl" "wget" "fzf" "ast-grep" "lldb"
 
     ;; zsh: plugins, and the programs that your aliases use
     "zsh-autosuggestions" "zsh-syntax-highlighting"

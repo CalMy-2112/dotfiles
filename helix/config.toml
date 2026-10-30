@@ -6,5 +6,18 @@ continue-comments = false
 auto-format = true
 auto-info = true
 path-completion = true
+end-of-line-diagnostics = "hint"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.lsp]
+display-inlay-hints = true
+auto-signature-help = false
+
+[keys.insert]
+C-k = "signature_help"
 
 

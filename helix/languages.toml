@@ -1,0 +1,79 @@
+
+[[language]]
+name = "bash"           # also zsh files (.zshrc ...)
+auto-format = true
+
+[[language]]
+name = "c"
+auto-format = true
+
+[[language]]
+name = "cpp"
+auto-format = true
+
+[[language]]
+name = "haskell"
+auto-format = true
+
+# Java: 4 spaces, as in nvim/after/ftplugin/java.lua.
+# jdtls also uses this indent when it formats the file.
+[[language]]
+name = "java"
+indent = { tab-width = 4, unit = "    " }
+auto-format = true
+
+[[language]]
+name = "javascript"
+auto-format = true
+
+[[language]]
+name = "jsx"
+auto-format = true
+
+# Lua: stylua formats the file, as LazyVim (conform) does. stylua uses the
+# nearest stylua.toml (nvim/stylua.toml for your Neovim files).
+# If stylua is not installed, lua-language-server formats the file.
+# LazyVim does the same.
+[[language]]
+name = "lua"
+formatter = { command = "stylua", args = ["--search-parent-directories", "-"] }
+auto-format = true
+
+[[language]]
+name = "nix"
+auto-format = true
+
+# Python: pyright only, as in lsp.lua.
+# (The Helix default is ty, ruff, jedi and pylsp.)
+# pyright does not format, as in Neovim.
+[[language]]
+name = "python"
+language-servers = ["pyright"]
+formatter = { command = "ruff", args = ["format", "-"] }
+auto-format = true
+
+[[language]]
+name = "scala"
+auto-format = true
+
+# SQL: sqls, as in lsp.lua. Helix has no SQL server by default.
+[[language]]
+name = "sql"
+language-servers = ["sqls"]
+auto-format = true
+
+[[language]]
+name = "tsx"
+auto-format = true
+
+[[language]]
+name = "typescript"
+auto-format = true
+
+[language-server.sqls]
+command = "sqls"
+
+# Haskell: the same formatter as in lsp.lua.
+# (Helix does not support semantic tokens, so that setting is not here.)
+[language-server.haskell-language-server.config.haskell]
+formattingProvider = "stylish-haskell"

@@ -1,0 +1,10 @@
+theme = "rose_pine"
+[editor]
+line-number = "relative"
+auto-completion = false
+continue-comments = false
+auto-format = true
+auto-info = true
+path-completion = true
+
+

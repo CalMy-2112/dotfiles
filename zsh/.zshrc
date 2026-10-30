@@ -35,8 +35,9 @@ alias :q='exit'
 alias python='python3'
 alias cls='clear'
 alias cat='bat'
-alias vi='nvim'
-alias vim='nvim'
+alias vi='hx'
+alias vim='hx'
+alias nvim='hx'
 alias gdb='gdb -q'
 
 clear

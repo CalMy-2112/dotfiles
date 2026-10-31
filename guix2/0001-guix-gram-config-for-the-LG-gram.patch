@@ -1,0 +1,1317 @@
+From 33b75de0d184caaef0aa3dade0785c4d7af7f5af Mon Sep 17 00:00:00 2001
+From: Calvin Myers <calmyers2112@outlook.com>
+Date: Sat, 31 Oct 2026 04:46:53 +0000
+Subject: [PATCH] guix/gram: config for the LG gram
+
+Guix System and Guix Home files for the LG gram 16 2-in-1 (16T90R),
+made from the Panasonic files in guix/:
+
+- config.scm: NVMe disk, US keyboard, user calmy, sof-firmware, zram,
+  power-profiles-daemon, Steam and rfkill udev rules. No circscroll.
+- home.scm: the Panasonic programs plus LibreOffice, mpv, Krita,
+  Kdenlive, Electrum, Tor Browser, Wine, Steam, Flatpak (Zen),
+  wlsunset and GNOME Settings for the swaync panel, and the
+  CaskaydiaCove Nerd Font. Links ~/.config/hypr, waybar, ... and
+  bin/* to the repository. Makes a Guix copy of swaync/style.css.
+  Skips a package name that Guix does not have, with a note.
+- installer.scm: the Guix installer with the nonguix kernel and
+  firmware, so that the gram's Wi-Fi works in the installer. Built on
+  the Panasonic.
+- INSTALL.md: backup, installer stick, Wi-Fi, install, restore and
+  check steps.
+- hypr/hyprland.lua: autostart without systemd (Guix).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01WNv4m7XN4JA5vDUnbnjgZQ
+---
+ guix/gram/INSTALL.md    | 490 ++++++++++++++++++++++++++++++++++++++++
+ guix/gram/config.scm    | 234 +++++++++++++++++++
+ guix/gram/home.scm      | 486 +++++++++++++++++++++++++++++++++++++++
+ guix/gram/installer.scm |  19 ++
+ hypr/hyprland.lua       |  13 +-
+ 5 files changed, 1238 insertions(+), 4 deletions(-)
+ create mode 100644 guix/gram/INSTALL.md
+ create mode 100644 guix/gram/config.scm
+ create mode 100644 guix/gram/home.scm
+ create mode 100644 guix/gram/installer.scm
+
+diff --git a/guix/gram/INSTALL.md b/guix/gram/INSTALL.md
+new file mode 100644
+index 0000000..2150d82
+--- /dev/null
++++ b/guix/gram/INSTALL.md
+@@ -0,0 +1,490 @@
++# Guix System on the LG gram 16 2-in-1 (16T90R): install steps
++
++This replaces Fedora on the gram. **The install erases the internal disk.**
++Do section A on Fedora first.
++
++Files in this folder:
++
++- `config.scm`: the system (kernel, Wi-Fi and sound firmware, disk, user
++  calmy, Bluetooth, tuigreet login screen, zram, power profiles, Tailscale).
++- `home.scm`: your programs and dotfiles (Hyprland, Waybar, swaync quick
++  settings, night light, LibreOffice, Krita, Kdenlive, mpv, Electrum, Tor
++  Browser, Wine, Steam, Flatpak for Zen, Neovim tools).
++- `installer.scm`: the Guix installer with the full kernel from nonguix,
++  so that the gram's Wi-Fi works in the installer. You build it on the
++  Panasonic (A4).
++- `../channels.scm`: Guix + nonguix + tailscale. The same file as for the
++  Panasonic. Used only for the first install.
++
++Differences from the Panasonic steps (`../INSTALL.md`):
++
++- The gram has no Ethernet port, and the normal Guix installer has no
++  driver for the gram's Wi-Fi. So you use a nonguix installer stick (A4),
++  and connect to Wi-Fi in the installer (C).
++- The disk is NVMe: the partitions are `nvme0n1p1` and `nvme0n1p2`.
++- No swap file. zram (in config.scm) does the same as on Fedora.
++- You do not copy or edit configs by hand. home.scm links `~/.config/hypr`,
++  `waybar`, `fuzzel`, ... to `~/dots`, and `hypr/hyprland.lua` in the
++  repository is already changed for Guix.
++
++
++## A. On Fedora, before you erase
++
++### A1. Put the new files in the repository
++
++    cd ~/dots
++    git am ~/Downloads/0001-guix-gram-config-for-the-LG-gram.patch
++    git push
++
++(Change the path to where you saved the patch.)
++
++### A2. Optional: more files for the repository
++
++- **qt6ct** (the look of Krita, Kdenlive and other Qt programs). home.scm
++  links `~/.config/qt6ct` if the folder is in the repository:
++
++      cp -r ~/.config/qt6ct ~/dots/
++      grep -n /usr ~/dots/qt6ct/qt6ct.conf
++
++  If grep shows a line with `/usr/share/qt6ct/...`, change `/usr` to
++  `/home/calmy/.guix-home/profile` in that line. Guix has no `/usr/share`.
++
++- **Scripts from `~/.local/bin`** that you want on the gram (for example
++  `cast-start`, `cast-stop`, `tvplay`, `tv-audio`). Every file in `bin/`
++  becomes a link in `~/.local/bin`:
++
++      cp ~/.local/bin/{cast-start,cast-stop,tvplay,tv-audio} ~/dots/bin/
++
++  These scripts can use Fedora programs. Send them to me if you want me to
++  check them.
++
++Then commit and push:
++
++    cd ~/dots && git add -A && git commit -m "qt6ct and scripts" && git push
++
++### A3. Back up what is not on the flash drive yet
++
++The flash drive has Documents, Projects and .zen. Do these steps too.
++
++1. Make sure that the archives on the flash drive are complete. Each line
++   must start with `OK`:
++
++       M=/run/media/calmy/main
++       for f in "$M"/*.tar.gz "$M"/.zen.tar.gz; do
++         tar -tzf "$f" >/dev/null && echo "OK  $f" || echo "BAD $f"
++       done
++
++2. Make sure that `.zen.tar.gz` has your real Zen profile. In Zen, open
++   `about:profiles`. Look at the "Root Directory" of the profile that is in
++   use.
++   - If it is in `~/.zen`, the archive is correct. If you used Zen after
++     you made it (31 Oct, 00:09), close Zen and make it again:
++
++         tar -czf "$M/.zen.tar.gz" -C ~ .zen
++
++   - If it is in `~/.config/zen`, the archive does not have your profile.
++     Close Zen and make it from that folder:
++
++         tar -czf "$M/.zen.tar.gz" -C ~/.config zen
++
++   Section G finds the profile in either archive.
++
++3. **CAUTION: your Bitcoin wallet is in `~/.electrum`. It is not on the
++   flash drive yet.** Make sure that you have the seed words on paper
++   (Electrum: Wallet > Seed). Then back up the wallet files with the other
++   small things (SSH keys, GPG keys, git settings, your scripts):
++
++       tar --ignore-failed-read -czf "$M/small-stuff.tar.gz" -C ~ \
++         .electrum .ssh .gnupg .gitconfig .local/bin .config/qt6ct
++       tar -tzf "$M/small-stuff.tar.gz" | cut -d/ -f1 | sort -u
++
++   The last command must show `.electrum` and `.ssh`.
++
++4. Look for other big folders that are not backed up (Pictures, Downloads,
++   Videos, a Wine folder `~/.wine`, ...):
++
++       du -sh ~/* ~/.[!.]* 2>/dev/null | sort -h | tail -25
++
++   Back up the ones that you need in the same way. The flash drive is FAT32:
++   one file can be 4 GiB maximum.
++
++5. Not necessary: Steam games (they download again), Bitwarden, Telegram
++   (they are in the cloud), Wi-Fi passwords (you type them again).
++
++### A4. Make the nonguix installer stick (on the Panasonic)
++
++The gram has no Ethernet port. Your Guix installer stick has no driver for
++the gram's Wi-Fi. `installer.scm` makes a Guix installer with the full
++kernel and firmware from nonguix. The Panasonic already runs that kernel,
++so it builds the image without compiling.
++
++Write the image to your old Guix installer stick. Do not use the backup
++flash drive. Do A1 first, so that `installer.scm` is on GitHub.
++
++1. On the Panasonic, get the files into a new folder. (Your `~/dots` on
++   the Panasonic does not change.)
++
++       git clone https://github.com/CalMy-2112/dotfiles /tmp/dots
++
++   Do not run `guix pull` before the next steps. The Panasonic's present
++   Guix has the kernel and firmware in its store already. A newer Guix can
++   need a kernel that nonguix has not built yet. Then the kernel compiles,
++   and that takes many hours.
++
++2. Make sure that there is space. The image and its parts need about 6 GB:
++
++       df -h /gnu
++
++3. Build the image. This takes 10 to 40 minutes. It downloads the parts
++   that are not on the Panasonic yet:
++
++       ISO=$(guix system image --image-type=iso9660 /tmp/dots/guix/gram/installer.scm)
++       echo $ISO
++
++   The last line shows a file name like `/gnu/store/...-image.iso`.
++   If you see `building` and then a name with `-linux-6` or `-linux-7` in
++   it (the kernel), stop with Ctrl+C and tell me.
++
++4. Put in the old Guix installer stick. Find it, and compare its size with
++   the size of the image. The stick must be larger:
++
++       lsblk -o NAME,SIZE,MODEL,TRAN
++       ls -lh $ISO
++
++   **CAUTION: on the Panasonic, `sda` is the internal disk (TRAN = sata).**
++   The stick is the line with TRAN = usb, for example `sdb`. Change `sdX`
++   to it. dd erases the disk that you name.
++
++       sudo dd if=$ISO of=/dev/sdX bs=4M status=progress oflag=sync
++
++
++## B. Boot the installer
++
++1. Remove the backup flash drive. Put in the nonguix installer stick (A4).
++2. Start the gram. Press F2 at the LG logo to open the setup utility.
++   Find **Secure Boot** (usually on the Boot or Security page) and set it
++   to **Disabled**. Guix's boot loader is not signed. Save and exit.
++3. Press F10 at the LG logo. Select the USB stick.
++4. When the installer menu shows, press Ctrl+Alt+F3. You get a root shell.
++   The text is small on this screen. That is normal.
++5. Make sure that the gram booted in UEFI mode. This command must list
++   files:
++
++       ls /sys/firmware/efi
++
++
++## C. Network (Wi-Fi)
++
++1. Make sure that you booted the nonguix stick:
++
++       uname -r
++       ip -br link
++
++   `uname -r` must not end in `-gnu` (that is the normal Guix kernel, which
++   has no Wi-Fi driver for the gram). `ip -br link` must show a line that
++   starts with `wl`, for example `wlan0` or `wlp0s20f3`.
++
++2. Connect to your Wi-Fi:
++
++       connmanctl
++
++   Then type these commands in connmanctl, one at a time:
++
++       enable wifi
++       scan wifi
++       services
++       agent on
++       connect wifi_..._psk
++       quit
++
++   For `connect`, use the ID that `services` shows next to your network
++   name. connmanctl asks for the password.
++
++3. Make sure that the network works:
++
++       ping -c 3 gnu.org
++
++You can also connect on the network page of the installer menu (tty1), and
++then go back to the root shell with Ctrl+Alt+F3.
++
++
++## D. Disk
++
++**CAUTION: these commands erase Fedora and all files on the internal disk.**
++
++1. Find the internal disk. It is `nvme0n1` (953.9G):
++
++       lsblk -o NAME,SIZE,MODEL,TRAN
++
++2. Erase, partition and format:
++
++       DISK=/dev/nvme0n1
++       wipefs -a ${DISK}p1 ${DISK}p2 ${DISK}p3 $DISK
++       parted -s -a optimal $DISK mklabel gpt \
++         mkpart ESP fat32 1MiB 1025MiB set 1 esp on \
++         mkpart root ext4 1025MiB 100%
++       mkfs.fat -F32 -i 1234ABCD ${DISK}p1
++       mkfs.ext4 -L guix-root ${DISK}p2
++
++   config.scm finds the disks by the label `guix-root` and the ID
++   `1234-ABCD`. Do not change one without the other.
++
++3. Mount, and keep the installer's downloads on the disk:
++
++       mount LABEL=guix-root /mnt
++       mkdir -p /mnt/boot/efi
++       mount ${DISK}p1 /mnt/boot/efi
++       herd start cow-store /mnt
++
++   No swap file is necessary: the gram has 32 GB of memory.
++
++
++## E. Install
++
++1. Get your files:
++
++       guix shell git -- git clone https://github.com/CalMy-2112/dotfiles /mnt/root/dots
++       mkdir -p /mnt/etc
++       cp /mnt/root/dots/guix/gram/config.scm /mnt/etc/config.scm
++
++2. Trust the nonguix build server, so that the kernel and firmware
++   download ready-built. (The installer from A4 has the nonguix kernel, but
++   it does not trust the nonguix build server yet.)
++
++       wget -O /tmp/nonguix.pub https://substitutes.nonguix.org/signing-key.pub
++       cat /tmp/nonguix.pub
++       guix archive --authorize < /tmp/nonguix.pub
++
++   The `q #...#` value in the output must be the same as in config.scm
++   (C1FD53E5...EA98). If it is not, stop and tell me.
++
++3. Install. This takes 30 to 90 minutes:
++
++       mkdir -p /mnt/var/cache/install
++       export XDG_CACHE_HOME=/mnt/var/cache/install
++       guix time-machine -C /mnt/root/dots/guix/channels.scm -- \
++         system init /mnt/etc/config.scm /mnt \
++         --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org'
++
++   If you see `building ...-linux-6...` or `...-linux-7...` (the kernel),
++   nonguix has no ready-built kernel for this Guix version yet. Compiling it
++   takes hours. You can let it run, or stop it with Ctrl+C and run the same
++   command again later. Tailscale always builds from source (some minutes).
++
++4. Restart and remove the USB stick:
++
++       reboot
++
++
++## F. First boot
++
++The tuigreet login screen shows on tty1. It starts Hyprland, and Hyprland
++is not installed until step 4. So do steps 1 to 4 on the text login on tty2.
++
++1. Press Ctrl+Alt+F2. Log in as `root`. The password is empty. Set the
++   passwords, then log out:
++
++       passwd
++       passwd calmy
++       exit
++
++2. Log in as `calmy` at the same prompt. Do not use `su calmy`:
++   NetworkManager (and later Hyprland) refuses, because you are not logged
++   in at the laptop. Wi-Fi now works:
++
++       nmcli device wifi connect "NETWORK NAME" --ask
++
++3. Update Guix. The first time takes 10 to 30 minutes.
++   /etc/guix/channels.scm already includes nonguix and tailscale.
++
++       guix pull
++       hash guix
++
++4. Get your files and install your programs. This downloads many GB
++   (LibreOffice, Kdenlive, Krita, Steam, Tor Browser), so it takes a long
++   time:
++
++       guix shell git -- git clone https://github.com/CalMy-2112/dotfiles ~/dots
++       guix home reconfigure ~/dots/guix/gram/home.scm
++
++   Read the first lines of the output:
++   - `home.scm: Hyprland 0.55.x (reads hyprland.lua)` is correct.
++   - `home.scm: Guix has no package "NAME"; skipped` means that one program
++     was not installed. The rest continues. Tell me the names.
++
++   Guix Home moves old files that it replaces to a backup folder in your
++   home. That is normal.
++
++5. Log out (`exit`). Press Ctrl+Alt+F1 and log in at tuigreet. Hyprland
++   starts. On tty2 (Ctrl+Alt+F2) you always get a text login. Use it if
++   Hyprland does not start.
++
++6. Delete the installer's download folder:
++
++       sudo rm -rf /var/cache/install
++
++
++## G. Restore your files
++
++1. Put in the backup flash drive. udiskie mounts it and shows a
++   notification. Find where:
++
++       lsblk -o NAME,SIZE,LABEL,MOUNTPOINTS
++
++   Set M to the mount point, for example:
++
++       M=/media/calmy/main
++
++2. Documents and Projects. First look at how the archive starts:
++
++       tar -tzf "$M/Documents.tar.gz" | head -3
++
++   - If the lines start with `Documents/`: `tar -xzf "$M/Documents.tar.gz" -C ~`
++   - If they start with `home/calmy/`: `tar -xzf "$M/Documents.tar.gz" -C /`
++
++   Do the same for `Projects.tar.gz`.
++
++3. Electrum wallet, SSH keys, GPG keys, git settings:
++
++       mkdir -p ~/restore
++       tar -xzf "$M/small-stuff.tar.gz" -C ~/restore
++       cp -a ~/restore/.electrum ~/restore/.ssh ~/
++       cp -a ~/restore/.gnupg ~/ 2>/dev/null
++       cp -a ~/restore/.gitconfig ~/ 2>/dev/null
++
++   Do not copy `~/restore/.local/bin` to `~/.local/bin`: Guix Home makes
++   that folder from `~/dots/bin`. The old scripts stay in
++   `~/restore/.local/bin` for you to look at.
++
++   Start `electrum`. It must show your wallet. Then you can delete
++   `~/restore`.
++
++4. Zen. Guix has no Zen package, so it comes from Flathub:
++
++       flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
++       flatpak install --user flathub app.zen_browser.zen
++       flatpak run app.zen_browser.zen
++
++   Close Zen when the window shows. Now put your old profile in:
++
++       Z=~/.var/app/app.zen_browser.zen
++       ls -a $Z $Z/config 2>/dev/null
++       mkdir -p ~/restore-zen
++       tar -xzf "$M/.zen.tar.gz" -C ~/restore-zen
++       OLD=$(dirname "$(find ~/restore-zen -name profiles.ini | head -1)")
++       echo $OLD
++
++   The `ls` shows the folder that Zen made: `.zen` in $Z, or `zen` in
++   `$Z/config`. Set NEW to it, then replace it with your old one:
++
++       NEW=$Z/.zen            # or: NEW=$Z/config/zen
++       mv "$NEW" "$NEW.empty"
++       cp -a "$OLD" "$NEW"
++       flatpak run app.zen_browser.zen
++
++   If Zen shows no old tabs, open `about:profiles`, find your old profile,
++   click "Set as default profile" and start Zen again. When all is
++   correct, delete `~/restore-zen` and `$NEW.empty`.
++
++   Zen shows in fuzzel after the next login. To update Zen:
++   `flatpak update`.
++
++
++## H. Other programs
++
++- **Steam:** run `steam`. The first start downloads Steam itself. Steam
++  runs in a container. Games go in `~/.local/share/guix-sandbox-home`.
++- **Wine:** run `winecfg` once. It makes `~/.wine`. If you backed up an
++  old `~/.wine`, restore it before that. Guix has no winetricks package.
++- **Tor Browser:** the command is `torbrowser`.
++- **LibreOffice, Krita, Kdenlive, mpv, Electrum:** start them from fuzzel
++  (Super+D).
++- **Tailscale:** `sudo tailscale up`, then open the link that it shows.
++- **Neovim tools that are not in Guix** (pyright, bashls, ts_ls, asm-lsp,
++  swank, metals, molten): do steps F5 to F8 in `../INSTALL.md`. They are
++  the same on the gram.
++
++
++## I. Check the gram
++
++Do these checks once. Tell me which ones fail.
++
++1. **Speakers.** Play a video or song. You said that the speakers work on
++   Fedora (kernel 7.2.13), so the kernel has the fix for this model. If
++   there is no sound from the speakers:
++
++       uname -r
++       cat /proc/asound/cards
++
++2. **Quick settings.** Super+S opens the swaync panel. Try Wi-Fi,
++   Bluetooth, Night Light, the sliders, Networks, Devices, Settings.
++   Also check:
++
++       swaync --version
++
++   Your style.css uses CSS variables (`--cc-bg`, ...). Only swaync 0.12 or
++   later reads them. If the version is older, the panel colors are partly
++   wrong. Tell me the version.
++
++3. **Night light.** Super+N, and the moon or sun icon in Waybar.
++4. **Brightness keys** and the keyboard backlight slider.
++5. **zram:** `swapon --show` shows `/dev/zram0` with 8G.
++6. **Power profiles:** `powerprofilesctl` shows `balanced`.
++7. **Touchscreen and pen:** draw in Krita.
++8. **Suspend:** close the lid, open it. hyprlock must ask for your
++   password.
++
++
++## J. If something does not work
++
++- **No Wi-Fi in the installer** (`uname -r` ends in `-gnu`, or no `wl...`
++  line): you booted the old Guix stick. Do A4 again, and check that dd
++  wrote to the stick.
++- **"No bootable device" after the install:** press F10 at the LG logo and
++  select the Guix entry. To remove Fedora's old boot entry:
++
++      sudo guix shell efibootmgr -- efibootmgr
++      sudo guix shell efibootmgr -- efibootmgr -b NNNN -B
++
++  (NNNN is the number of the Fedora line.)
++- **Hyprland does not start at tuigreet:** press Ctrl+Alt+F2, log in, and
++  run `start-hyprland` there. The error shows in the terminal.
++- **A swaync button does nothing:** run its command (in
++  `~/dots/swaync/config.json`) in a terminal. The error shows there.
++- **A key or a Waybar click does nothing:** the program is probably not
++  installed. Find it with `guix search NAME`, add it to home.scm and run
++  `guix home reconfigure` again.
++- To go back to an older system, select it in the GRUB menu at boot.
++  To undo the last home change: `guix home roll-back`.
++
++
++## Later
++
++    guix pull                                              # new package versions
++    sudo guix system reconfigure ~/dots/guix/gram/config.scm
++    guix home reconfigure ~/dots/guix/gram/home.scm
++    flatpak update                                         # Zen
++
++Your configs in `~/.config` (hypr, waybar, fuzzel, alacritty, fastfetch,
++yazi, helix, nvim, swaync/config.json) are links to `~/dots`. Edit them
++there, then commit and push from `~/dots`. Two exceptions:
++
++- `swaync/style.css` is a copy (see `%swaync-style` in home.scm). After you
++  edit `~/dots/swaync/style.css`, run `guix home reconfigure` again.
++- `.zshrc` and `.tmux.conf.local` are copies too. Run `guix home
++  reconfigure` after you edit them in `~/dots`.
++
++
++## Known differences from Fedora
++
++- Hyprland is the Guix version (0.55.x), not 0.57. hyprland.lua is for
++  0.55, so it works.
++- Zen is a Flatpak. It updates with `flatpak update`, not with Guix.
++- Steam runs in a container. Its games are in
++  `~/.local/share/guix-sandbox-home`, not in `~/.local/share/Steam`.
++- Not in this config (Fedora had them): winetricks (Guix has no package),
++  Docker, Telegram. Tell me if you want them.
++- No systemd. Use `loginctl` (suspend, reboot, poweroff) and
++  `sudo herd status` for services.
++- hyprpaper runs through a small wrapper in home.scm, the same as on the
++  Panasonic (a Guix EGL problem).
+diff --git a/guix/gram/config.scm b/guix/gram/config.scm
+new file mode 100644
+index 0000000..6e23d63
+--- /dev/null
++++ b/guix/gram/config.scm
+@@ -0,0 +1,234 @@
++;; config.scm -- Guix System for the LG gram 16 2-in-1 (16T90R-K.ADB9U1)
++;;
++;; Made from ../config.scm (the Panasonic). Changes for the gram:
++;;   - NVMe disk (nvme0n1p1, nvme0n1p2), no swap file: zram, like Fedora
++;;   - US keyboard, no circscroll (the gram has a normal touchpad)
++;;   - user calmy, host calmySchool (the same as on Fedora)
++;;   - Sound Open Firmware (the gram's Intel audio needs it)
++;;   - power-profiles-daemon (Fedora had tuned-ppd)
++;;   - udev rules: Steam controllers, rfkill for the swaync Bluetooth button
++;;
++;; First install, from the live USB (see INSTALL.md in this folder):
++;;   guix time-machine -C ../channels.scm -- system init config.scm /mnt
++;; Later changes, on the installed system:
++;;   sudo guix system reconfigure ~/dots/guix/gram/config.scm
++;;
++;; Programs for your user are in home.scm, not here.
++
++(use-modules (gnu)
++             (guix channels)
++             (srfi srfi-1)                      ;find, remove
++             ((gnu packages admin) #:select (tuigreet))
++             ((gnu packages fonts) #:select (font-terminus))
++             ((gnu packages linux) #:select (brightnessctl))
++             ((gnu packages shells) #:select (zsh))
++             ((gnu packages xdisorg) #:select (hyprlock))
++             (nongnu packages linux)            ;full kernel and firmware
++             (nongnu system linux-initrd)       ;CPU microcode
++             (btv tailscale))                   ;tailscale channel
++(use-service-modules desktop linux pm xorg)
++
++;; nonguix: the full Linux kernel and the firmware for the Intel Wi-Fi,
++;; Bluetooth, GPU and audio. The same lines are in ../channels.scm.
++(define %nonguix-channel
++  (channel
++   (name 'nonguix)
++   (url "https://gitlab.com/nonguix/nonguix")
++   (introduction
++    (make-channel-introduction
++     "897c1a470da759236cc11798f4e0a5f7d4d59fbc"
++     (openpgp-fingerprint
++      "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5")))))
++
++;; Tailscale (Fedora had it too). The same lines are in ../channels.scm.
++;; There is no build server: Guix builds it from source.
++(define %tailscale-channel
++  (channel
++   (name 'tailscale)
++   (url "https://github.com/umanwizard/guix-tailscale")
++   (branch "main")
++   (introduction
++    (make-channel-introduction
++     "52e82318f282c555757ef077d93a685fda97565d"
++     (openpgp-fingerprint
++      "9E53FC33B8328C745E7B31F70226C10D7877B741")))))
++
++;; Signing key of the nonguix build server. It must be the same as
++;; https://substitutes.nonguix.org/signing-key.pub
++(define %nonguix-key
++  (plain-file
++   "nonguix.pub"
++   "(public-key (ecc (curve Ed25519) (q #C1FD53E5D4CE971933EC50C9F307AE2171A2D3B52C804642A7A35F84F3A4EA98#)))"))
++
++;; Disks. INSTALL.md makes the partitions with this label and this ID.
++(define %root-fs
++  (file-system
++    (mount-point "/")
++    (device (file-system-label "guix-root"))
++    (type "ext4")))
++
++(define %esp-fs
++  (file-system
++    (mount-point "/boot/efi")
++    (device (uuid "1234-ABCD" 'fat))    ;made by: mkfs.fat -i 1234ABCD
++    (type "vfat")))
++
++;; Login screen: tuigreet, the same as on the Panasonic.
++;; After login it starts Hyprland.
++(define %tuigreet
++  (program-file
++   "tuigreet-session"
++   #~(execl #$(file-append tuigreet "/bin/tuigreet") "tuigreet"
++            "--time" "--remember" "--asterisks"
++            "--cmd" "start-hyprland")))
++
++;; tuigreet keeps the last user name in /var/cache/tuigreet ("--remember").
++;; The "greeter" user must be able to write there. This runs at every boot.
++(define %tuigreet-cache
++  (simple-service
++   'tuigreet-cache activation-service-type
++   (with-imported-modules '((guix build utils))
++     #~(begin
++         (use-modules (guix build utils))
++         (let ((greeter (false-if-exception (getpwnam "greeter"))))
++           (mkdir-p "/var/cache/tuigreet")
++           (when greeter
++             (chown "/var/cache/tuigreet"
++                    (passwd:uid greeter) (passwd:gid greeter))))))))
++
++;; Big console font for tuigreet and the text consoles (Terminus 16x32).
++;; The 16" 2560x1600 screen makes the normal 8x16 font very small.
++(define %console-fonts
++  (map (lambda (tty)
++         (cons tty (file-append font-terminus "/share/consolefonts/ter-132n")))
++       '("tty1" "tty2" "tty3" "tty4" "tty5" "tty6")))
++
++;; The Bluetooth button in the swaync panel runs "rfkill unblock bluetooth"
++;; as your user. Let the "netdev" group (you) use /dev/rfkill.
++(define %rfkill-rule
++  (udev-rule "90-rfkill-netdev.rules"
++             "KERNEL==\"rfkill\", GROUP=\"netdev\", MODE=\"0664\"\n"))
++
++;; power-profiles-daemon (balanced / power-saver / performance, also in
++;; GNOME Settings > Power). Added only if %desktop-services does not already
++;; have it, because a service type two times is an error.
++(define %power-profiles
++  (if (find (lambda (service)
++              (eq? (service-kind service) power-profiles-daemon-service-type))
++            %desktop-services)
++      '()
++      (list (service power-profiles-daemon-service-type))))
++
++;; tuigreet uses tty1, so remove the text login on tty1.
++;; tty2 to tty6 keep the normal text login (Ctrl+Alt+F2).
++(define (tty1-login? service)
++  (and (eq? (service-kind service) mingetty-service-type)
++       (string=? "tty1" (mingetty-configuration-tty (service-value service)))))
++
++(operating-system
++  (host-name "calmySchool")
++  (timezone "America/New_York")
++  (locale "en_US.utf8")
++
++  (keyboard-layout (keyboard-layout "us"))
++
++  (kernel linux)
++  (initrd microcode-initrd)
++  ;; sof-firmware: the gram's sound card (Intel Raptor Lake, SOF driver).
++  ;; Fedora has the same files in alsa-sof-firmware.
++  ;; specification->package finds it in whichever nonguix module has it.
++  (firmware (list linux-firmware
++                  (specification->package "sof-firmware")))
++
++  ;; Less text at boot: "quiet" is already in the defaults, loglevel=3 also
++  ;; hides kernel warnings.
++  (kernel-arguments (cons "loglevel=3" %default-kernel-arguments))
++
++  (bootloader (bootloader-configuration
++               (bootloader grub-efi-bootloader)
++               (targets '("/boot/efi"))
++               (keyboard-layout keyboard-layout)))
++
++  (file-systems (cons* %root-fs %esp-fs %base-file-systems))
++
++  (users (cons (user-account
++                (name "calmy")
++                (group "users")
++                (home-directory "/home/calmy")
++                (shell (file-append zsh "/bin/zsh"))
++                (supplementary-groups '("wheel" "netdev" "audio" "video")))
++               %base-user-accounts))
++
++  ;; tailscale: the "tailscale" command (the service only runs tailscaled).
++  (packages (cons* tailscale %base-packages))
++
++  (services
++   (append
++    (list
++     ;; Login screen on tty1.
++     (service greetd-service-type
++              (greetd-configuration
++               (terminals
++                (list (greetd-terminal-configuration
++                       (terminal-vt "1")
++                       (terminal-switch #t)
++                       (default-session-command %tuigreet))))))
++     %tuigreet-cache
++
++     ;; hyprlock checks your password with the PAM file /etc/pam.d/hyprlock.
++     ;; This service makes that file. (hyprlock itself is in home.scm.)
++     (service screen-locker-service-type
++              (screen-locker-configuration
++               (name "hyprlock")
++               (program (file-append hyprlock "/bin/hyprlock"))
++               (using-pam? #t)
++               (using-setuid? #f)))
++
++     ;; Bluetooth (Waybar module, swaync button, blueman).
++     (service bluetooth-service-type
++              (bluetooth-configuration (auto-enable? #t)))
++
++     ;; Brightness keys and the swaync slider without sudo ("video" group).
++     (udev-rules-service 'brightnessctl brightnessctl)
++
++     ;; Steam controllers and other game pads (Fedora: steam-devices).
++     (udev-rules-service 'steam-devices
++                         (specification->package "steam-devices-udev-rules"))
++
++     ;; swaync Bluetooth button (see %rfkill-rule above).
++     (udev-rules-service 'rfkill-netdev %rfkill-rule)
++
++     ;; Compressed swap in RAM, like Fedora's zram0 (8 GiB). No swap file.
++     (service zram-device-service-type
++              (zram-device-configuration
++               (size "8G")
++               (compression-algorithm 'zstd)))
++
++     ;; Tailscale daemon (Shepherd service "tailscaled"). State is in
++     ;; /var/lib/tailscale. Log in once with: sudo tailscale up
++     (service tailscale-service-type))
++
++    %power-profiles
++
++    ;; %desktop-services: NetworkManager, elogind, D-Bus, polkit, udisks...
++    (remove tty1-login?
++            (modify-services %desktop-services
++              ;; greetd replaces the GNOME login screen.
++              (delete gdm-service-type)
++              (console-font-service-type config => %console-fonts)
++              (guix-service-type
++               config => (guix-configuration
++                          (inherit config)
++                          ;; Write nonguix and tailscale into
++                          ;; /etc/guix/channels.scm, so that a plain
++                          ;; "guix pull" gets them.
++                          (channels (cons* %tailscale-channel
++                                           %nonguix-channel
++                                           %default-channels))
++                          ;; Download the kernel and firmware already built.
++                          (substitute-urls
++                           (append (guix-configuration-substitute-urls config)
++                                   (list "https://substitutes.nonguix.org")))
++                          (authorized-keys
++                           (append (guix-configuration-authorized-keys config)
++                                   (list %nonguix-key))))))))))
+diff --git a/guix/gram/home.scm b/guix/gram/home.scm
+new file mode 100644
+index 0000000..ecaed04
+--- /dev/null
++++ b/guix/gram/home.scm
+@@ -0,0 +1,486 @@
++;; home.scm -- programs, dotfiles and user services for calmy on the
++;; LG gram (Guix Home)
++;;
++;;   guix home reconfigure ~/dots/guix/gram/home.scm
++;;
++;; Made from ../home.scm (the Panasonic). This file is in guix/gram/ of your
++;; dotfiles repository (~/dots). It uses these repository files, if they are
++;; there:
++;;   zsh/.zshrc               -> ~/.config/zsh/.zshrc
++;;   tmux/.tmux.conf.local    -> ~/.tmux.conf.local
++;;   swaync/config.json       -> ~/.config/swaync/config.json (a link)
++;;   swaync/style.css         -> ~/.config/swaync/style.css (changed for Guix,
++;;                               see %swaync-style)
++;;   bin/*                    -> ~/.local/bin/* (links, so they stay editable)
++;;   hypr/, waybar/, nvim/... -> ~/.config/... (links, see %linked-configs)
++;;
++;; To add a program: add its name below and run the command again.
++;; To find a name: guix search WORD
++
++(use-modules (gnu home)
++             (gnu home services)
++             (gnu home services desktop)   ;D-Bus
++             (gnu home services shells)    ;zsh
++             (gnu home services sound)     ;PipeWire
++             (gnu packages)
++             ((gnu packages base) #:select (glibc))
++             ((gnu packages bash) #:select (bash-minimal))
++             ((gnu packages elf) #:select (patchelf))
++             ((gnu packages gcc) #:select (gcc))
++             ((gnu packages gl) #:select (mesa))
++             ((gnu packages python) #:select (python))
++             ((gnu packages xdisorg) #:select (hyprpaper))
++             (gnu services)
++             (guix build-system copy)
++             (guix build-system font)
++             (guix build-system trivial)
++             (guix download)
++             (guix gexp)
++             (guix git-download)
++             ((guix licenses) #:prefix license:)
++             (guix packages)
++             (guix utils)
++             (ice-9 ftw)                   ;scandir
++             (srfi srfi-1))                ;filter-map
++
++;;;
++;;; The dotfiles repository
++;;;
++
++;; Two folders above this file: /home/calmy/dots. (The Panasonic home.scm
++;; is one folder higher, in guix/, so it uses one dirname.)
++(define %dots (dirname (dirname (current-source-directory))))
++
++;; A file from the repository, or #f (with a note) if it is not there yet.
++(define (dots-file name relative)
++  (let ((file (string-append %dots "/" relative)))
++    (if (file-exists? file)
++        (local-file (assume-valid-file-name file) name)
++        (begin
++          (format (current-error-port)
++                  "home.scm: ~a is not in the repository yet; skipped~%"
++                  relative)
++          #f))))
++
++;; A link to a file or folder in the repository. The files are not copied
++;; to the store, so you can edit them (and lazy.nvim can write
++;; lazy-lock.json).
++(define (dots-link relative)
++  (computed-file (string-append (basename relative) "-link")
++                 #~(symlink #$(string-append %dots "/" relative) #$output)))
++
++;; Folders in ~/.config that are links to the repository. hypr/hyprland.lua
++;; in the repository is already changed for Guix, so no copying and no
++;; editing is necessary. A name whose folder is not in the repository is
++;; skipped (for example qt6ct, until you add it).
++(define %linked-configs
++  (filter (lambda (name)
++            (file-exists? (string-append %dots "/" name)))
++          '("nvim" "hypr" "waybar" "fuzzel" "alacritty" "fastfetch"
++            "yazi" "helix" "qt6ct")))
++
++;; Every file in bin/ of the repository becomes a link in ~/.local/bin
++;; (nightlight, and any script that you add there later).
++(define %dots-bin
++  (let ((dir (string-append %dots "/bin")))
++    (if (file-exists? dir)
++        (map (lambda (name)
++               (list (string-append ".local/bin/" name)
++                     (dots-link (string-append "bin/" name))))
++             (scandir dir (lambda (name)
++                            (not (string-prefix? "." name)))))
++        '())))
++
++;;;
++;;; Things that Guix does not have
++;;;
++
++;; oh-my-zsh and oh-my-tmux, at fixed versions. To update: change the
++;; commit, run "guix home reconfigure", and copy the new hash from the error.
++(define oh-my-zsh
++  (origin
++    (method git-fetch)
++    (uri (git-reference
++          (url "https://github.com/ohmyzsh/ohmyzsh")
++          (commit "17a2b4c3a5855524ad4772a17ada0dc474e2fdf3")))  ;2026-10-27
++    (file-name "oh-my-zsh-checkout")
++    (sha256
++     (base32 "1pgffrmln711b9afhiqfy3ncfai5pc9lxc3081ya97545mssyllv"))))
++
++(define oh-my-tmux
++  (origin
++    (method git-fetch)
++    (uri (git-reference
++          (url "https://github.com/gpakosz/.tmux")
++          ;; The same .tmux.conf that you used on Debian (2026-08-08).
++          (commit "58a3dcc0d718ec0fa1c0d5a2fddd640a1ad7a5b7")))
++    (file-name "oh-my-tmux-checkout")
++    (sha256
++     (base32 "0zky4qkndrs645xnxh6498zc8yj7y581sg72hh0h7b31a5jxng30"))))
++
++;; Phinger cursors are not in Guix, so this file packages them.
++;; Themes: phinger-cursors-dark, -light, -dark-left, -light-left.
++(define phinger-cursors
++  (package
++    (name "phinger-cursors")
++    (version "2.2")
++    (source (origin
++              (method url-fetch)
++              (uri (string-append "https://github.com/phisch/phinger-cursors"
++                                  "/releases/download/v" version
++                                  "/phinger-cursors-variants.tar.bz2"))
++              (sha256
++               (base32
++                "0mkfbafxskqw02kyn81j9zvhnywglysjg41klfnrrh9q1b1wzm26"))))
++    (build-system copy-build-system)
++    (arguments
++     (list
++      #:phases
++      #~(modify-phases %standard-phases
++          ;; The tarball has four theme folders and no top folder.
++          ;; Unpack it here, without going into a folder.
++          (replace 'unpack
++            (lambda* (#:key source #:allow-other-keys)
++              (invoke "tar" "xf" source))))
++      #:install-plan
++      #~'(("phinger-cursors-dark" "share/icons/")
++          ("phinger-cursors-light" "share/icons/")
++          ("phinger-cursors-dark-left" "share/icons/")
++          ("phinger-cursors-light-left" "share/icons/"))))
++    (home-page "https://github.com/phisch/phinger-cursors")
++    (synopsis "Phinger cursor theme")
++    (description
++     "Phinger is a cursor theme with dark, light and left-handed variants.")
++    (license license:cc-by-sa4.0)))
++
++;; nvim-treesitter needs tree-sitter CLI 0.26.1 or later. Guix has 0.25.3,
++;; so this uses the upstream release binary. The binary expects a normal
++;; Linux file layout, so patchelf points it to Guix's glibc and libgcc.
++(define tree-sitter-cli-bin
++  (package
++    (name "tree-sitter-cli-bin")
++    (version "0.27.1")
++    (source (origin
++              (method url-fetch)
++              (uri (string-append "https://github.com/tree-sitter/tree-sitter"
++                                  "/releases/download/v" version
++                                  "/tree-sitter-linux-x64.gz"))
++              (sha256
++               (base32
++                "0zcbr5hdjd75mn8dyaz43d1nd0sxywsy524pviyq5mm39gwl446h"))))
++    (build-system copy-build-system)
++    (arguments
++     (list
++      #:install-plan #~'(("tree-sitter" "bin/"))
++      #:phases
++      #~(modify-phases %standard-phases
++          (replace 'unpack
++            (lambda* (#:key source #:allow-other-keys)
++              (copy-file source "tree-sitter.gz")
++              (invoke "gzip" "-d" "tree-sitter.gz")
++              (chmod "tree-sitter" #o755)))
++          (add-after 'install 'patch-elf
++            (lambda* (#:key inputs #:allow-other-keys)
++              (let ((bin (string-append #$output "/bin/tree-sitter")))
++                (invoke "patchelf" "--set-interpreter"
++                        (search-input-file inputs "/lib/ld-linux-x86-64.so.2")
++                        bin)
++                (invoke "patchelf" "--set-rpath"
++                        (string-append
++                         (dirname (search-input-file inputs "/lib/libgcc_s.so.1"))
++                         ":"
++                         (dirname (search-input-file inputs "/lib/libc.so.6")))
++                        bin)))))))
++    (native-inputs (list patchelf))
++    (inputs (list glibc (list gcc "lib")))
++    (supported-systems '("x86_64-linux"))
++    (home-page "https://tree-sitter.github.io/")
++    (synopsis "Tree-sitter command-line tool (upstream binary)")
++    (description "This package provides the @command{tree-sitter} command.")
++    (license license:expat)))
++
++;; hyprpaper 0.8 draws with hyprtoolkit. Guix links hyprtoolkit to the libEGL
++;; of libglvnd, but Guix's mesa is built without libglvnd, so that libEGL has
++;; no driver and hyprpaper stops with
++;;   CRIT from hyprtoolkit ]: [GL] eglGetProcAddress(eglCreateImageKHR) failed
++;; Hyprland and hyprlock use mesa's libEGL directly, so they work.
++;; This "hyprpaper" command loads mesa's EGL and GLES first, then starts the
++;; real hyprpaper. Nothing is compiled. Remove it when Guix fixes hyprtoolkit.
++(define hyprpaper-with-mesa
++  (package
++    (name "hyprpaper-with-mesa")
++    (version (package-version hyprpaper))
++    (source #f)
++    (build-system trivial-build-system)
++    (arguments
++     (list
++      #:modules '((guix build utils))
++      #:builder
++      #~(begin
++          (use-modules (guix build utils))
++          (let* ((bin    (string-append #$output "/bin"))
++                 (script (string-append bin "/hyprpaper")))
++            (mkdir-p bin)
++            (call-with-output-file script
++              (lambda (port)
++                (format port "#!~a
++export LD_PRELOAD=\"~a ~a${LD_PRELOAD:+ $LD_PRELOAD}\"
++exec ~a \"$@\"~%"
++                        #$(file-append bash-minimal "/bin/sh")
++                        #$(file-append mesa "/lib/libEGL.so.1")
++                        #$(file-append mesa "/lib/libGLESv2.so.2")
++                        #$(file-append hyprpaper "/bin/hyprpaper"))))
++            (chmod script #o755)))))
++    (home-page (package-home-page hyprpaper))
++    (synopsis "Hyprpaper, started with Mesa's EGL")
++    (description
++     "This package provides a @command{hyprpaper} command that loads Mesa's
++EGL and GLES libraries first, then starts Hyprpaper.")
++    (license (package-license hyprpaper))))
++
++
++;; CaskaydiaCove Nerd Font (Cascadia Code with the Nerd Font icons). Your
++;; swaync style uses "CaskaydiaCove Nerd Font Propo". Fedora had it
++;; (cascadia-code-nf-fonts); Guix does not, so this file packages it.
++(define font-nerd-cascadia-code
++  (package
++    (name "font-nerd-cascadia-code")
++    (version "3.5.1")
++    (source (origin
++              (method url-fetch)
++              (uri (string-append "https://github.com/ryanoasis/nerd-fonts"
++                                  "/releases/download/v" version
++                                  "/CascadiaCode.tar.xz"))
++              (sha256
++               (base32
++                "0sc3m8imzx4ii5vg0m2b9a20njg0bmqi6i9nxsinm17206a8wndf"))))
++    (build-system font-build-system)
++    (arguments
++     (list
++      #:phases
++      #~(modify-phases %standard-phases
++          ;; The tarball has the font files and no top folder.
++          (replace 'unpack
++            (lambda* (#:key source #:allow-other-keys)
++              (invoke "tar" "xf" source))))))
++    (home-page "https://www.nerdfonts.com/")
++    (synopsis "Cascadia Code font with Nerd Font icons (CaskaydiaCove)")
++    (description
++     "This package provides CaskaydiaCove Nerd Font: the Cascadia Code font
++with the Nerd Font icons added, in normal, Mono and Propo forms.")
++    (license license:silofl1.1)))
++
++(define swaynotificationcenter
++  (specification->package "swaynotificationcenter"))
++
++;; Your swaync/style.css starts with
++;;   @import url("file:///etc/xdg/swaync/style.css");
++;; That line loads the default swaync style on Fedora. Guix has no
++;; /etc/xdg/swaync, so on Guix that line loads nothing, and the panel gets
++;; your colors without the base style. This makes a copy of your style.css
++;; that loads the default style from the swaync package instead. The file
++;; in the repository does not change. After you edit it, run
++;; "guix home reconfigure" again (style.css is a copy, not a link).
++(define %swaync-style
++  (let ((file (string-append %dots "/swaync/style.css")))
++    (and (file-exists? file)
++         (computed-file
++          "swaync-style.css"
++          #~(begin
++              (use-modules (ice-9 textual-ports)
++                           (srfi srfi-1))
++              (let* ((default #$(file-append swaynotificationcenter
++                                             "/etc/xdg/swaync/style.css"))
++                     (user (call-with-input-file
++                               #$(local-file (assume-valid-file-name file)
++                                             "swaync-user-style.css")
++                             get-string-all))
++                     ;; All lines except the @import of the Fedora path.
++                     (lines (remove
++                             (lambda (line)
++                               (and (string-prefix? "@import"
++                                                    (string-trim line))
++                                    (string-contains line
++                                                     "swaync/style.css")))
++                             (string-split user #\newline))))
++                (call-with-output-file #$output
++                  (lambda (port)
++                    ;; A newer swaync can keep its default style inside the
++                    ;; program. Then there is no file to import.
++                    (if (file-exists? default)
++                        (format port "@import url(\"file://~a\");~%" default)
++                        (display "/* this swaync has no default style file */\n"
++                                 port))
++                    (display (string-join lines "\n") port)))))))))
++
++;;;
++;;; Programs
++;;;
++
++(define %my-packages
++  '(;; Hyprland and its tools
++    ;; hyprpaper: see hyprpaper-with-mesa above (added below, in packages)
++    "hyprland" "hyprlock" "hypridle" "hyprsunset"
++    "hyprpolkitagent"
++    "xdg-desktop-portal" "xdg-desktop-portal-hyprland" "xdg-desktop-portal-gtk"
++    "waybar" "fuzzel" "swaynotificationcenter" "libnotify"
++    "grim" "slurp" "swappy" "wl-clipboard"
++    "dbus" "xdg-utils" "qt6ct"
++    ;; gsettings, for the dark GTK theme and cursor lines in hyprland.lua
++    "glib:bin" "gsettings-desktop-schemas" "dconf"
++
++    ;; Waybar modules and their click actions: sound, brightness, media,
++    ;; network (nm-connection-editor), Bluetooth (blueman, bluetoothctl)
++    "pipewire" "wireplumber" "pavucontrol"
++    "brightnessctl" "playerctl"
++    "network-manager-applet" "blueman" "bluez"
++    ;; USB drives mount by themselves (udiskie --notify in hyprland.lua)
++    "udiskie"
++
++    ;; GNOME features on Hyprland (the swaync quick settings panel)
++    "wlsunset"               ;bin/nightlight (Super+N, the Night Light button)
++    "gnome-control-center"   ;the Networks, Devices and Settings buttons
++
++    ;; Programs (the Panasonic list)
++    "firefox" "bitwarden-desktop" "alacritty" "btop" "tmux" "neovim"
++    "yazi" "fastfetch" "git" "curl" "wget" "fzf" "ast-grep" "lldb" "helix" "ruff"
++
++    ;; Programs from Fedora
++    "libreoffice" "hunspell-dict-en-us"   ;the dictionary: spelling check
++    "mpv" "krita" "kdenlive"
++    "electrum"               ;Bitcoin wallet. Restore ~/.electrum (INSTALL.md)
++    "torbrowser"             ;the command is "torbrowser"
++    "wine64"                 ;also runs 32-bit Windows programs
++    "steam"                  ;from nonguix, runs in a container (INSTALL.md)
++    "flatpak"                ;for Zen, which Guix does not have (INSTALL.md)
++
++    ;; zsh: plugins, and the programs that your aliases use
++    "zsh-autosuggestions" "zsh-syntax-highlighting"
++    "eza" "bat" "gdb"
++    "ncurses" "perl"   ;clear, tput (zshrc, oh-my-tmux); perl (oh-my-tmux)
++
++    ;; Neovim (LazyVim): search, build tools for treesitter parsers
++    "ripgrep" "fd" "gcc-toolchain" "make" "unzip"
++    ;; Language servers from your lsp.lua. pyright, bashls and ts_ls come
++    ;; from npm (see ../INSTALL.md, F5). nixd and hls are not here.
++    "clang"                  ;clangd
++    "gopls" "sqls" "lua-language-server" "shfmt"
++    "rust" "rust:cargo" "rust-analyzer"   ;rustaceanvim
++    "node"                   ;npm, for the servers above
++    ;; molten-nvim and jupytext.nvim (Python host and Jupyter)
++    "python-pynvim" "python-jupyter-client@7" "python-nbformat"
++    "python-ipykernel@6" "python-jupytext"
++    ;; conjure + swank (your Lisp autocmd), metals (Scala)
++    "sbcl" "openjdk"
++
++    ;; Fonts and icons. Noto Sans CJK shows Japanese text.
++    ;; breeze-icons: the Qt icon theme that Fedora used (breeze-dark).
++    "font-nerd-jetbrains-mono" "font-google-noto" "font-google-noto-emoji"
++    "font-google-noto-sans-cjk" "adwaita-icon-theme" "hicolor-icon-theme"
++    "gnome-themes-extra" "breeze-icons"))
++
++;; Like specifications->packages, but a name that Guix does not have is
++;; skipped with a note, so that one wrong name does not stop the rest.
++;; Read the output of "guix home reconfigure" for "skipped".
++;; (specification->package stops Guix for an unknown name, so first look
++;; for the name with find-best-packages-by-name.)
++(define (specification->name+version spec)
++  ;; "glib:bin" -> "glib" #f, "python-ipykernel@6" -> "python-ipykernel" "6"
++  (let* ((colon (string-index spec #\:))
++         (base  (if colon (substring spec 0 colon) spec))
++         (at    (string-index base #\@)))
++    (if at
++        (values (substring base 0 at) (substring base (+ at 1)))
++        (values base #f))))
++
++(define (specifications->packages/skip specs)
++  (filter-map
++   (lambda (spec)
++     (call-with-values (lambda () (specification->name+version spec))
++       (lambda (name version)
++         (if (null? (find-best-packages-by-name name version))
++             (begin
++               (format (current-error-port)
++                       "home.scm: Guix has no package ~s; skipped~%" spec)
++               #f)
++             (call-with-values
++                 (lambda () (specification->package+output spec))
++               list)))))
++   specs))
++
++;; Your hyprland.lua needs Hyprland 0.55 or later. Print the version.
++(let ((version (package-version (specification->package "hyprland"))))
++  (format (current-error-port) "home.scm: Hyprland ~a~a~%" version
++          (if (version>=? version "0.55")
++              " (reads hyprland.lua)"
++              " -- OLDER THAN 0.55, it does not read hyprland.lua")))
++
++;;;
++;;; Dotfiles
++;;;
++
++(define %zshrc (dots-file "zshrc" "zsh/.zshrc"))
++(define %tmux-local (dots-file "tmux.conf.local" "tmux/.tmux.conf.local"))
++
++;; Files in your home folder.
++(define %home-files
++  (append
++   (filter
++    identity
++    (list
++     ;; oh-my-tmux, the same as on the Panasonic.
++     `(".tmux.conf" ,(file-append oh-my-tmux "/.tmux.conf"))
++     (and %tmux-local `(".tmux.conf.local" ,%tmux-local))
++     ;; options.lua uses ~/.virtualenvs/neovim/bin/python3 as the Python
++     ;; host. Point it to the Python that has pynvim and jupyter_client.
++     `(".virtualenvs/neovim/bin/python3" ,(file-append python "/bin/python3"))))
++   ;; ~/.local/bin/nightlight and the other scripts in bin/.
++   %dots-bin))
++
++;; Files in ~/.config.
++(define %config-files
++  (append
++   (map (lambda (name) (list name (dots-link name)))
++        %linked-configs)
++   (filter
++    identity
++    (list
++     (and (file-exists? (string-append %dots "/swaync/config.json"))
++          `("swaync/config.json" ,(dots-link "swaync/config.json")))
++     (and %swaync-style
++          `("swaync/style.css" ,%swaync-style))))))
++
++(home-environment
++ (packages (cons* phinger-cursors
++                  tree-sitter-cli-bin
++                  python
++                  hyprpaper-with-mesa
++                  font-nerd-cascadia-code
++                  (specifications->packages/skip %my-packages)))
++ (services
++  (list
++   (simple-service
++    'session-variables home-environment-variables-service-type
++    '(;; Where Hyprland and other programs look for cursor themes. Guix's
++      ;; default list does not include the Guix Home profile.
++      ("XCURSOR_PATH"
++       . "$HOME/.local/share/icons:$HOME/.icons:$HOME/.guix-home/profile/share/icons:/run/current-system/profile/share/icons")
++      ;; Flatpak programs (Zen) in the fuzzel menu.
++      ("XDG_DATA_DIRS"
++       . "$XDG_DATA_DIRS:$HOME/.local/share/flatpak/exports/share")))
++   ;; Session D-Bus. PipeWire, the portals and notifications need it.
++   (service home-dbus-service-type)
++   ;; PipeWire + WirePlumber, with PulseAudio support (Waybar sound module).
++   (service home-pipewire-service-type)
++   ;; zsh: oh-my-zsh from Guix, then your .zshrc from the repository.
++   ;; (Hyprland is started by tuigreet, see config.scm.)
++   (service home-zsh-service-type
++            (home-zsh-configuration
++             (zshrc
++              (filter identity
++                      (list (mixed-text-file "oh-my-zsh-path"
++                                             "export ZSH=" oh-my-zsh "\n")
++                            %zshrc)))))
++   (simple-service 'dotfiles home-files-service-type %home-files)
++   (simple-service 'config-files home-xdg-configuration-files-service-type
++                   %config-files))))
+diff --git a/guix/gram/installer.scm b/guix/gram/installer.scm
+new file mode 100644
+index 0000000..3c718c4
+--- /dev/null
++++ b/guix/gram/installer.scm
+@@ -0,0 +1,19 @@
++;; installer.scm -- the Guix installer, with the full Linux kernel and
++;; firmware from nonguix, so that the gram's Wi-Fi works in the installer.
++;;
++;; Build it on the Panasonic (Guix with nonguix), see INSTALL.md, A4:
++;;   guix system image --image-type=iso9660 ~/dots/guix/gram/installer.scm
++;;
++;; This is smaller than nonguix's own nongnu/system/install.scm: that file
++;; also builds Guix with nonguix inside the image, which can compile for
++;; hours. The install (INSTALL.md, E3) gets nonguix with "guix time-machine",
++;; so the installer does not need it.
++
++(use-modules (gnu)
++             (gnu system install)       ;installation-os
++             (nongnu packages linux))   ;linux, linux-firmware
++
++(operating-system
++  (inherit installation-os)
++  (kernel linux)
++  (firmware (list linux-firmware)))
+diff --git a/hypr/hyprland.lua b/hypr/hyprland.lua
+index 39301a5..15a8f9b 100644
+--- a/hypr/hyprland.lua
++++ b/hypr/hyprland.lua
+@@ -465,10 +465,15 @@ hl.workspace_rule({
+ 
+ -- Autostart
+ hl.on("hyprland.start", function()
+-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+-    hl.exec_cmd("systemctl --user start hyprland-session.target")
+-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+-    hl.exec_cmd("systemctl --user start hyprpolkitagent")
++    -- Guix: there is no systemd. This gives the D-Bus programs (portals,
++    -- swaync, GNOME Settings) the Wayland variables. Guix Home (home.scm)
++    -- installs the polkit agent here, not in a systemd unit.
++    hl.exec_cmd("dbus-update-activation-environment --all")
++    hl.exec_cmd("~/.guix-home/profile/libexec/hyprpolkitagent")
++    -- GTK programs (Zen, pavucontrol, blueman) read the cursor from gsettings.
++    -- Use the same theme and size as XCURSOR_THEME and XCURSOR_SIZE above.
++    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme \"phinger-cursors-dark\"")
++    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 40")
+     hl.exec_cmd("waybar")
+     hl.exec_cmd("swaync") -- quick-settings: replaces mako
+     hl.exec_cmd("~/.local/bin/nightlight init") -- quick-settings
+-- 
+2.43.0
+

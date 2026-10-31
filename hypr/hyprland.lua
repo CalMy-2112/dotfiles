@@ -465,10 +465,15 @@ hl.workspace_rule({
 
 -- Autostart
 hl.on("hyprland.start", function()
-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
-    hl.exec_cmd("systemctl --user start hyprland-session.target")
-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
-    hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    -- Guix: there is no systemd. This gives the D-Bus programs (portals,
+    -- swaync, GNOME Settings) the Wayland variables. Guix Home (home.scm)
+    -- installs the polkit agent here, not in a systemd unit.
+    hl.exec_cmd("dbus-update-activation-environment --all")
+    hl.exec_cmd("~/.guix-home/profile/libexec/hyprpolkitagent")
+    -- GTK programs (Zen, pavucontrol, blueman) read the cursor from gsettings.
+    -- Use the same theme and size as XCURSOR_THEME and XCURSOR_SIZE above.
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme \"phinger-cursors-dark\"")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 40")
     hl.exec_cmd("waybar")
     hl.exec_cmd("swaync") -- quick-settings: replaces mako
     hl.exec_cmd("~/.local/bin/nightlight init") -- quick-settings

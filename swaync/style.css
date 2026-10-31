@@ -1,0 +1,65 @@
+/* swaync theme: Rose Pine, the same colors as your waybar.
+   The first line loads the default swaync style. The rest changes colors. */
+@import url("file:///etc/xdg/swaync/style.css");
+
+:root {
+  --cc-bg: rgba(25, 23, 36, 0.96);
+  --noti-border-color: #403d52;
+  --noti-bg: 31, 29, 46;
+  --noti-bg-alpha: 0.96;
+  --noti-bg-darker: #191724;
+  --noti-bg-hover: #26233a;
+  --noti-bg-focus: rgba(38, 35, 58, 0.6);
+  --noti-close-bg: #403d52;
+  --noti-close-bg-hover: #524f67;
+  --text-color: #e0def4;
+  --text-color-disabled: #6e6a86;
+  --bg-selected: #c4a7e7;
+  --border-radius: 10px;
+  --font-size-body: 13px;
+  --font-size-summary: 14px;
+}
+
+* {
+  font-family: "CaskaydiaCove Nerd Font Propo", "CaskaydiaCove Nerd Font", sans-serif;
+}
+
+.control-center {
+  border: 1px solid #403d52;
+}
+
+/* Quick settings buttons: dark pills, purple when on (like GNOME).
+   The swaync docs give two class names for this widget, so both are here. */
+.widget-buttons-grid > flowbox > flowboxchild > button,
+.widget-buttons > flowbox > flowboxchild > button {
+  background: #26233a;
+  color: #e0def4;
+  border: none;
+  border-radius: 999px;
+  min-height: 36px;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button:hover,
+.widget-buttons > flowbox > flowboxchild > button:hover {
+  background: #403d52;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button.active,
+.widget-buttons-grid > flowbox > flowboxchild > button:checked,
+.widget-buttons > flowbox > flowboxchild > button.active,
+.widget-buttons > flowbox > flowboxchild > button:checked {
+  background: #c4a7e7;
+  color: #191724;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button.active label,
+.widget-buttons-grid > flowbox > flowboxchild > button:checked label,
+.widget-buttons > flowbox > flowboxchild > button.active label,
+.widget-buttons > flowbox > flowboxchild > button:checked label {
+  color: #191724;
+}
+
+/* Sliders */
+.control-center scale trough {
+  background: #403d52;
+}
+.control-center scale trough highlight {
+  background: #c4a7e7;
+}

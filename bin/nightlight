@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# nightlight - warm screen tint for Hyprland, like GNOME Night Light.
+# It uses wlsunset (Fedora package). Stopping wlsunset gives normal colors.
+#
+#   nightlight on       warm now, until you turn it off
+#   nightlight off      normal colors
+#   nightlight auto     warm from SUNSET to SUNRISE, normal colors in the day
+#   nightlight toggle   warm now -> off, not warm now -> on   (Super+N)
+#   nightlight init     auto mode, used once at login
+#   nightlight status   prints true if the screen is warm now (swaync button)
+#   nightlight swaync   on or off from the swaync button state
+#   nightlight waybar   JSON for the waybar module
+set -u
+
+# quick-settings.sh copied these values from your GNOME Night Light settings
+# when it could. Change them here if you want. No restart is necessary for
+# "on". For "auto", run: nightlight auto
+WARM=2700        # Kelvin. A lower value is warmer.
+SUNSET=20:00     # start of the warm period in auto mode (HH:MM)
+SUNRISE=06:00    # end of the warm period in auto mode (HH:MM)
+FADE=1800        # seconds of slow change after SUNSET and before SUNRISE
+
+STATE_FILE="${XDG_RUNTIME_DIR:-/tmp}/nightlight-state"
+WAYBAR_SIGNAL=8  # must be the same as "signal" in the waybar module
+
+# True if a wlsunset process runs. A killed process that is not yet removed
+# (state Z) does not count.
+running() { ps -C wlsunset -o stat= 2>/dev/null | grep -qv '^Z'; }
+
+state() {
+  # If wlsunset does not run, the screen has normal colors.
+  if running; then
+    cat "$STATE_FILE" 2>/dev/null || echo on
+  else
+    echo off
+  fi
+}
+
+minutes() { local h=${1%%:*} m=${1##*:}; echo $((10#$h * 60 + 10#$m)); }
+
+is_night() {
+  local now s r
+  now=$(minutes "$(date +%H:%M)")
+  s=$(minutes "$SUNSET")
+  r=$(minutes "$SUNRISE")
+  if (( s > r )); then
+    (( now >= s || now < r ))
+  else
+    (( now >= s && now < r ))
+  fi
+}
+
+warm_now() {
+  case $(state) in
+    on)   return 0 ;;
+    auto) is_night ;;
+    *)    return 1 ;;
+  esac
+}
+
+tell_waybar() { pkill -RTMIN+"$WAYBAR_SIGNAL" -x waybar 2>/dev/null; }
+
+stop_wlsunset() {
+  pkill -x wlsunset
+  # Wait until the old wlsunset is gone, so that the next one gets the
+  # gamma control of the screen.
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    running || return 0
+    sleep 0.1
+  done
+}
+
+start_wlsunset() {
+  stop_wlsunset
+  setsid -f wlsunset "$@" >/dev/null 2>&1
+}
+
+do_on() {
+  # The high temperature is only 1 K above the low one, so the screen is
+  # warm at all times of day. wlsunset needs high > low.
+  start_wlsunset -t "$WARM" -T "$((WARM + 1))" -S "$SUNRISE" -s "$SUNSET"
+  echo on > "$STATE_FILE"
+}
+
+do_auto() {
+  start_wlsunset -t "$WARM" -T 6500 -S "$SUNRISE" -s "$SUNSET" -d "$FADE"
+  echo auto > "$STATE_FILE"
+}
+
+do_off() {
+  stop_wlsunset
+  echo off > "$STATE_FILE"
+}
+
+case "${1:-toggle}" in
+  on)     do_on;   tell_waybar ;;
+  off)    do_off;  tell_waybar ;;
+  auto)   do_auto; tell_waybar ;;
+  toggle)
+    # Go by what you see: a warm screen goes off, a normal screen goes warm.
+    if warm_now; then do_off; else do_on; fi
+    tell_waybar ;;
+  init)
+    do_auto
+    # At login waybar can still be starting. A real-time signal can stop a
+    # program that is not ready for it, so tell waybar a few seconds later.
+    (sleep 5; tell_waybar) >/dev/null 2>&1 &
+    ;;
+  status)
+    if warm_now; then echo true; else echo false; fi ;;
+  swaync)
+    if [[ ${SWAYNC_TOGGLE_STATE:-} == true ]]; then do_on; else do_off; fi
+    tell_waybar ;;
+  waybar)
+    # waybar decodes the \u escapes, so the icons do not depend on copy and paste.
+    case $(state) in
+      on)   printf '%s\n' '{"text":"\uf186","tooltip":"Night light: on","class":"on"}' ;;
+      auto) printf '{"text":"\\uf017","tooltip":"Night light: auto (%s to %s)","class":"auto"}\n' "$SUNSET" "$SUNRISE" ;;
+      *)    printf '%s\n' '{"text":"\uf185","tooltip":"Night light: off","class":"off"}' ;;
+    esac ;;
+  *)
+    echo "usage: nightlight on|off|auto|toggle|init|status|swaync|waybar" >&2
+    exit 1 ;;
+esac

@@ -20,4 +20,6 @@ auto-signature-help = false
 [keys.insert]
 C-k = "signature_help"
 
+[keys.normal]
+F5 = [":write", ":sh hxrun \"%{buffer_name}\""]
 

@@ -1,6 +1,6 @@
 ;; home.scm -- programs, dotfiles and user services for osho (Guix Home)
 ;;
-;;   guix home reconfigure ~/dots/guix/home.scm
+;;   guix home reconfigure ~/dots/guix/panasonic/home.scm
 ;;
 ;; This file is in the guix/ folder of your dotfiles repository (~/dots).
 ;; It uses these files from the repository, if they are there:
@@ -41,8 +41,8 @@
 ;;; The dotfiles repository
 ;;;
 
-;; The folder above this file, for example /home/osho/dots.
-(define %dots (dirname (current-source-directory)))
+;; Two folders above this file (guix/panasonic/), for example /home/osho/dots.
+(define %dots (dirname (dirname (current-source-directory))))
 
 ;; A file from the repository, or #f (with a note) if it is not there yet.
 (define (dots-file name relative)

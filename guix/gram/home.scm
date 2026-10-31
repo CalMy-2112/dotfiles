@@ -3,7 +3,7 @@
 ;;
 ;;   guix home reconfigure ~/dots/guix/gram/home.scm
 ;;
-;; Made from ../home.scm (the Panasonic). This file is in guix/gram/ of your
+;; Made from ../panasonic/home.scm. This file is in guix/gram/ of your
 ;; dotfiles repository (~/dots). It uses these repository files, if they are
 ;; there:
 ;;   zsh/.zshrc               -> ~/.config/zsh/.zshrc
@@ -47,8 +47,7 @@
 ;;; The dotfiles repository
 ;;;
 
-;; Two folders above this file: /home/calmy/dots. (The Panasonic home.scm
-;; is one folder higher, in guix/, so it uses one dirname.)
+;; Two folders above this file (guix/gram/): /home/calmy/dots.
 (define %dots (dirname (dirname (current-source-directory))))
 
 ;; A file from the repository, or #f (with a note) if it is not there yet.
@@ -362,7 +361,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     ;; Neovim (LazyVim): search, build tools for treesitter parsers
     "ripgrep" "fd" "gcc-toolchain" "make" "unzip"
     ;; Language servers from your lsp.lua. pyright, bashls and ts_ls come
-    ;; from npm (see ../INSTALL.md, F5). nixd and hls are not here.
+    ;; from npm (see ../panasonic/INSTALL.md, F5). nixd and hls are not here.
     "clang"                  ;clangd
     "gopls" "sqls" "lua-language-server" "shfmt"
     "rust" "rust:cargo" "rust-analyzer"   ;rustaceanvim

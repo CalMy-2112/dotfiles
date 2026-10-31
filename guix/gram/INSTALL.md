@@ -16,7 +16,7 @@ Files in this folder:
 - `../channels.scm`: Guix + nonguix + tailscale. The same file as for the
   Panasonic. Used only for the first install.
 
-Differences from the Panasonic steps (`../INSTALL.md`):
+Differences from the Panasonic steps (`../panasonic/INSTALL.md`):
 
 - The gram has no Ethernet port, and the normal Guix installer has no
   driver for the gram's Wi-Fi. So you use a nonguix installer stick (A4),
@@ -401,7 +401,7 @@ is not installed until step 4. So do steps 1 to 4 on the text login on tty2.
   (Super+D).
 - **Tailscale:** `sudo tailscale up`, then open the link that it shows.
 - **Neovim tools that are not in Guix** (pyright, bashls, ts_ls, asm-lsp,
-  swank, metals, molten): do steps F5 to F8 in `../INSTALL.md`. They are
+  swank, metals, molten): do steps F5 to F8 in `../panasonic/INSTALL.md`. They are
   the same on the gram.
 
 

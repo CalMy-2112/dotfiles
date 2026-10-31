@@ -1,6 +1,6 @@
 ;; config.scm -- Guix System for the LG gram 16 2-in-1 (16T90R-K.ADB9U1)
 ;;
-;; Made from ../config.scm (the Panasonic). Changes for the gram:
+;; Made from ../panasonic/config.scm. Changes for the gram:
 ;;   - NVMe disk (nvme0n1p1, nvme0n1p2), no swap file: zram, like Fedora
 ;;   - US keyboard, no circscroll (the gram has a normal touchpad)
 ;;   - user calmy, host calmySchool (the same as on Fedora)

@@ -3,7 +3,7 @@
 ;; First install, from the live USB (see INSTALL.md):
 ;;   guix time-machine -C channels.scm -- system init config.scm /mnt
 ;; Later changes, on the installed system:
-;;   sudo guix system reconfigure ~/dots/guix/config.scm
+;;   sudo guix system reconfigure ~/dots/guix/panasonic/config.scm
 ;;
 ;; Programs for your user are in home.scm, not here.
 

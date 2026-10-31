@@ -8,14 +8,15 @@ Files in this folder:
 - `circscroll.c`: the circular-scrolling program. config.scm builds it.
 - `home.scm`: your programs, user services and dotfiles (Hyprland, Waybar,
   PipeWire, zsh + oh-my-zsh, tmux + oh-my-tmux, wallpaper, Neovim tools).
-- `channels.scm`: Guix + nonguix. Used only for the first install.
+- `../channels.scm`: Guix + nonguix. Used only for the first install.
 
 home.scm also uses these files from the repository, if they are there:
 `zsh/.zshrc`, `tmux/.tmux.conf.local`, `wallpapers/bay.jpg` and the `nvim/`
 folder. Section F says what to put there.
 
 Change `YOU/DOTS` below to your GitHub repository. These steps expect this
-folder to be at `guix/` in that repository.
+folder to be at `guix/panasonic/` in that repository, with `channels.scm`
+in `guix/`.
 
 The install erases the internal disk.
 
@@ -103,7 +104,7 @@ The install erases the internal disk.
 
        guix shell git -- git clone https://github.com/YOU/DOTS /mnt/root/dots
        mkdir -p /mnt/etc
-       cp /mnt/root/dots/guix/config.scm /mnt/root/dots/guix/circscroll.c /mnt/etc/
+       cp /mnt/root/dots/guix/panasonic/config.scm /mnt/root/dots/guix/panasonic/circscroll.c /mnt/etc/
 
    config.scm needs circscroll.c in the same folder.
 
@@ -165,7 +166,7 @@ not installed until step 4. So do steps 1 to 4 on the text login on tty2.
 4. Get your files and install your programs:
 
        guix shell git -- git clone https://github.com/YOU/DOTS ~/dots
-       guix home reconfigure ~/dots/guix/home.scm
+       guix home reconfigure ~/dots/guix/panasonic/home.scm
 
    This prints `home.scm: Hyprland 0.55.x (reads hyprland.lua)`.
    If a repository file from section F is missing, it prints
@@ -226,12 +227,12 @@ Do this on a system that is already installed (or after section E).
 2. Apply the system part: tuigreet on tty1, the Terminus 16x32 console
    font, zsh as login shell, less boot text:
 
-       sudo guix system reconfigure ~/dots/guix/config.scm
+       sudo guix system reconfigure ~/dots/guix/panasonic/config.scm
 
 3. Apply the home part: oh-my-zsh, plugins, oh-my-tmux, the wallpaper, the
    Neovim link and tools:
 
-       guix home reconfigure ~/dots/guix/home.scm
+       guix home reconfigure ~/dots/guix/panasonic/home.scm
 
 4. If tmux is running, stop it (`tmux kill-server`). Then reboot:
 
@@ -282,7 +283,7 @@ circscroll stops, the real touchpad works as before.
 
 1. Apply it:
 
-       sudo guix system reconfigure ~/dots/guix/config.scm
+       sudo guix system reconfigure ~/dots/guix/panasonic/config.scm
 
    The service starts at once. You do not have to restart Hyprland.
 
@@ -313,8 +314,8 @@ circscroll stops, the real touchpad works as before.
 ## Later
 
     guix pull                                         # get new package versions
-    sudo guix system reconfigure ~/dots/guix/config.scm
-    guix home reconfigure ~/dots/guix/home.scm
+    sudo guix system reconfigure ~/dots/guix/panasonic/config.scm
+    guix home reconfigure ~/dots/guix/panasonic/home.scm
     guix home roll-back                               # undo the last home change
 
 To go back to an older system, select it in the GRUB menu at boot.

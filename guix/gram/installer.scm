@@ -11,9 +11,22 @@
 
 (use-modules (gnu)
              (gnu system install)       ;installation-os
-             (nongnu packages linux))   ;linux, linux-firmware
+             (nongnu packages linux)    ;linux, linux-firmware
+             (srfi srfi-1))             ;remove
 
 (operating-system
   (inherit installation-os)
   (kernel linux)
-  (firmware (list linux-firmware)))
+  (firmware (list linux-firmware))
+
+  ;; Remove the gc-root service. In the normal installer it keeps a copy of
+  ;; the "bare-bones" example system, so that installing that example
+  ;; downloads less. In Guix of October 2026 (commit 9cc4f49) that copy does
+  ;; not build: the example uses the new "transformation" field (tune for
+  ;; skylake), and the copy fails with
+  ;;   etc points to inexistent file or dangling symlink /gnu/store/...-etc
+  ;; Your install does not use the example, so nothing is lost.
+  (services
+   (remove (lambda (service)
+             (eq? (service-kind service) gc-root-service-type))
+           (operating-system-user-services installation-os))))

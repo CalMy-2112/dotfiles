@@ -346,7 +346,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
 
     ;; Programs from Fedora
     "libreoffice" "hunspell-dict-en-us"   ;the dictionary: spelling check
-    "mpv" "krita" "kdenlive"
+    "mpv" ; "krita" "kdenlive"        ;build failed aadd back later
     "electrum"               ;Bitcoin wallet. Restore ~/.electrum (INSTALL.md)
     "torbrowser"             ;the command is "torbrowser"
     "wine64"                 ;also runs 32-bit Windows programs
@@ -375,8 +375,10 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     ;; Fonts and icons. Noto Sans CJK shows Japanese text.
     ;; breeze-icons: the Qt icon theme that Fedora used (breeze-dark).
     "font-nerd-jetbrains-mono" "font-google-noto" "font-google-noto-emoji"
-    "font-google-noto-sans-cjk" "adwaita-icon-theme" "hicolor-icon-theme"
-    "gnome-themes-extra" "breeze-icons"))
+    "font-google-noto-sans-cjk" "font-google-noto-serif-cjk" "adwaita-icon-theme" "hicolor-icon-theme"
+    "gnome-themes-extra" "breeze-icons" "font-liberation" "font-carlito" "font-dejavu" "font-microsoft-web-core-fonts"
+    "font-google-roboto" "font-open-sans" "font-inter" "font-ibm-plex" "font-adobe-source-sans" "font-adobe-source-serif"
+     "font-adobe-source-code-pro" "font-tex-gyre" "font-comic-neue" "font-gnu-freefont"))
 
 ;; Like specifications->packages, but a name that Guix does not have is
 ;; skipped with a note, so that one wrong name does not stop the rest.

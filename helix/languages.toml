@@ -1,3 +1,4 @@
+use-grammars = { except = ["gotmpl"] }
 
 [[language]]
 name = "bash"           # also zsh files (.zshrc ...)
@@ -77,3 +78,15 @@ command = "sqls"
 # (Helix does not support semantic tokens, so that setting is not here.)
 [language-server.haskell-language-server.config.haskell]
 formattingProvider = "stylish-haskell"
+
+
+[[language]]
+name = "markdown"
+language-servers = ["harper-ls"]
+
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
+[language-server.harper-ls.config.harper-ls]
+dialect = "American"

@@ -198,6 +198,36 @@
     (description "This package provides the @command{tree-sitter} command.")
     (license license:expat)))
 
+;; harper-ls: spelling and grammar check for Helix. Guix does not have it.
+;; The upstream musl binary is static, so it does not need patchelf.
+(define harper-ls-bin
+  (package
+    (name "harper-ls-bin")
+    (version "3.0.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://github.com/Automattic/harper"
+                                  "/releases/download/v" version
+                                  "/harper-ls-x86_64-unknown-linux-musl.tar.gz"))
+              (sha256
+               (base32
+                "1b2vx36lcinjwnrq4g3rfa6gn35zgb5l0qf3asdisvh0gniyaqnf"))))
+    (build-system copy-build-system)
+    (arguments
+     (list
+      #:install-plan #~'(("harper-ls" "bin/"))
+      #:phases
+      #~(modify-phases %standard-phases
+          ;; The tarball has only the file harper-ls, no folder.
+          (replace 'unpack
+            (lambda* (#:key source #:allow-other-keys)
+              (invoke "tar" "xzf" source))))))
+    (supported-systems '("x86_64-linux"))
+    (home-page "https://writewithharper.com/")
+    (synopsis "Harper grammar checker language server (upstream binary)")
+    (description "This package provides the @command{harper-ls} command.")
+    (license license:asl2.0)))
+
 ;; hyprpaper 0.8 draws with hyprtoolkit. Guix links hyprtoolkit to the libEGL
 ;; of libglvnd, but Guix's mesa is built without libglvnd, so that libEGL has
 ;; no driver and hyprpaper stops with
@@ -324,7 +354,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     "xdg-desktop-portal" "xdg-desktop-portal-hyprland" "xdg-desktop-portal-gtk"
     "waybar" "fuzzel" "swaynotificationcenter" "libnotify"
     "grim" "slurp" "swappy" "wl-clipboard"
-    "dbus" "xdg-utils" "qt6ct"
+    "dbus" "xdg-utils" "qt6ct" "openssh"
     ;; gsettings, for the dark GTK theme and cursor lines in hyprland.lua
     "glib:bin" "gsettings-desktop-schemas" "dconf"
 
@@ -454,6 +484,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
 (home-environment
  (packages (cons* phinger-cursors
                   tree-sitter-cli-bin
+                  harper-ls-bin
                   python
                   hyprpaper-with-mesa
                   font-nerd-cascadia-code

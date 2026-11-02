@@ -8,6 +8,14 @@ auto-info = true
 path-completion = true
 end-of-line-diagnostics = "hint"
 
+[editor.soft-wrap]
+enable = true
+max-wrap = 25
+max-indent-retain = 0
+wrap-indicator = ""
+wrap-at-text-width = false
+
+
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"

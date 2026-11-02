@@ -35,6 +35,7 @@ alias :q='exit'
 alias python='python3'
 alias cls='clear'
 alias cat='bat'
+export BAT_THEME="gruvbox-dark"
 alias vi='hx'
 alias vim='hx'
 alias nvim='hx'

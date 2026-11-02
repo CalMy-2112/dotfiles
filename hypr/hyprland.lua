@@ -120,8 +120,9 @@ hl.config({
         resize_on_border = true,
         allow_tearing = false,
         col = {
-            active_border = { colors = { "rgba(89b4faee)", "rgba(cba6f7ee)" }, angle = 45 },
-            inactive_border = "rgba(45475aee)",
+            -- Gruvbox Dark: yellow to orange (active), bg2 (inactive)
+            active_border = { colors = { "rgba(fabd2fee)", "rgba(fe8019ee)" }, angle = 45 },
+            inactive_border = "rgba(504945ee)",
         },
     },
 })
@@ -142,7 +143,7 @@ hl.config({
             enabled = true,
             range = 12,
             render_power = 3,
-            color = "rgba(1a1a1aee)",
+            color = "rgba(1d2021ee)",
         },
     },
 })

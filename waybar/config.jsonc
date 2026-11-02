@@ -74,15 +74,15 @@
       "format-icons": [
       "<span size='8pt'>━</span>",
       "<span size='8pt'>■</span>",
-      "<span size='8pt' color='#908caa'>■■</span>",
-      "<span size='8pt' color='#9ccfd8'>■■■</span>",
-      "<span size='8pt' color='#31748f'>■■■■</span>",
-      "<span size='8pt' color='#c4a7e7'>■■■■■</span>",
-      "<span size='8pt' color='#ebbcba'>■■■■■■</span>",
-      "<span size='8pt' color='#f6c177'>■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■■■</span>"
+      "<span size='8pt' color='#a89984'>■■</span>",
+      "<span size='8pt' color='#83a598'>■■■</span>",
+      "<span size='8pt' color='#8ec07c'>■■■■</span>",
+      "<span size='8pt' color='#b8bb26'>■■■■■</span>",
+      "<span size='8pt' color='#fabd2f'>■■■■■■</span>",
+      "<span size='8pt' color='#fe8019'>■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■■■</span>"
     ]
   },
   "memory": {
@@ -91,15 +91,15 @@
       "format-icons": [
       "<span size='8pt'>━</span>",
       "<span size='8pt'>■</span>",
-      "<span size='8pt' color='#908caa'>■■</span>",
-      "<span size='8pt' color='#9ccfd8'>■■■</span>",
-      "<span size='8pt' color='#31748f'>■■■■</span>",
-      "<span size='8pt' color='#c4a7e7'>■■■■■</span>",
-      "<span size='8pt' color='#ebbcba'>■■■■■■</span>",
-      "<span size='8pt' color='#f6c177'>■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■■</span>",
-      "<span size='8pt' color='#eb6f92'>■■■■■■■■■■</span>"
+      "<span size='8pt' color='#a89984'>■■</span>",
+      "<span size='8pt' color='#83a598'>■■■</span>",
+      "<span size='8pt' color='#8ec07c'>■■■■</span>",
+      "<span size='8pt' color='#b8bb26'>■■■■■</span>",
+      "<span size='8pt' color='#fabd2f'>■■■■■■</span>",
+      "<span size='8pt' color='#fe8019'>■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■■</span>",
+      "<span size='8pt' color='#fb4934'>■■■■■■■■■■</span>"
     ]
   },
   "clock": {
@@ -111,9 +111,9 @@
       "mode-mon-col": 3,
       "on-click-right": "mode",
       "format": {
-        "month": "<span color='#f6c177'><b>{}</b></span>",
-        "weekdays": "<span color='#9ccfd8'><b>{}</b></span>",
-        "today": "<span color='#eb6f92'><b>{}</b></span>"
+        "month": "<span color='#fabd2f'><b>{}</b></span>",
+        "weekdays": "<span color='#8ec07c'><b>{}</b></span>",
+        "today": "<span color='#fb4934'><b>{}</b></span>"
       }
     }
   },
@@ -137,30 +137,30 @@
     "format-plugged": "",
     "format-icons": {
       "charging": [
-       "󰢜 <span size='8pt' color='#eb6f92'>━</span>",
-       "󰢜 <span size='8pt' color='#eb6f92'>■</span>",
-       "󰂆 <span size='8pt' color='#ebbcba'>■■</span>",
-       "󰂇 <span size='8pt' color='#f6c177'>■■■</span>",
-       "󰂈 <span size='8pt' color='#f6c177'>■■■■</span>",
-       "󰢝 <span size='8pt' color='#908caa'>■■■■■</span>",
-       "󰂉 <span size='8pt' color='#9ccfd8'>■■■■■■</span>",
-       "󰢞 <span size='8pt' color='#9ccfd8'>■■■■■■■</span>",
-       "󰂊 <span size='8pt' color='#31748f'>■■■■■■■■</span>",
-       "󰂋 <span size='8pt' color='#31748f'>■■■■■■■■■</span>",
-       "󰂅 <span size='8pt' color='#31748f'>■■■■■■■■■■</span>"
+       "󰢜 <span size='8pt' color='#fb4934'>━</span>",
+       "󰢜 <span size='8pt' color='#fb4934'>■</span>",
+       "󰂆 <span size='8pt' color='#fe8019'>■■</span>",
+       "󰂇 <span size='8pt' color='#fabd2f'>■■■</span>",
+       "󰂈 <span size='8pt' color='#fabd2f'>■■■■</span>",
+       "󰢝 <span size='8pt' color='#b8bb26'>■■■■■</span>",
+       "󰂉 <span size='8pt' color='#b8bb26'>■■■■■■</span>",
+       "󰢞 <span size='8pt' color='#8ec07c'>■■■■■■■</span>",
+       "󰂊 <span size='8pt' color='#8ec07c'>■■■■■■■■</span>",
+       "󰂋 <span size='8pt' color='#8ec07c'>■■■■■■■■■</span>",
+       "󰂅 <span size='8pt' color='#8ec07c'>■■■■■■■■■■</span>"
       ],
       "default": [
-      "󰁺 <span size='8pt' color='#eb6f92'>━</span>",
-      "󰁺 <span size='8pt' color='#eb6f92'>■</span>",
-      "󰁻 <span size='8pt' color='#ebbcba'>■■</span>",
-      "󰁼 <span size='8pt' color='#f6c177'>■■■</span>",
-      "󰁽 <span size='8pt' color='#f6c177'>■■■■</span>",
-      "󰁾 <span size='8pt' color='#908caa'>■■■■■</span>",
-      "󰁿 <span size='8pt' color='#9ccfd8'>■■■■■■</span>",
-      "󰂀 <span size='8pt' color='#9ccfd8'>■■■■■■■</span>",
-      "󰂁 <span size='8pt' color='#31748f'>■■■■■■■■</span>",
-      "󰂂 <span size='8pt' color='#31748f'>■■■■■■■■■</span>",
-      "󰁹 <span size='8pt' color='#31748f'>■■■■■■■■■■</span>"
+      "󰁺 <span size='8pt' color='#fb4934'>━</span>",
+      "󰁺 <span size='8pt' color='#fb4934'>■</span>",
+      "󰁻 <span size='8pt' color='#fe8019'>■■</span>",
+      "󰁼 <span size='8pt' color='#fabd2f'>■■■</span>",
+      "󰁽 <span size='8pt' color='#fabd2f'>■■■■</span>",
+      "󰁾 <span size='8pt' color='#b8bb26'>■■■■■</span>",
+      "󰁿 <span size='8pt' color='#b8bb26'>■■■■■■</span>",
+      "󰂀 <span size='8pt' color='#8ec07c'>■■■■■■■</span>",
+      "󰂁 <span size='8pt' color='#8ec07c'>■■■■■■■■</span>",
+      "󰂂 <span size='8pt' color='#8ec07c'>■■■■■■■■■</span>",
+      "󰁹 <span size='8pt' color='#8ec07c'>■■■■■■■■■■</span>"
       ]
     },
     "format-full": "󰂅",

@@ -1,40 +1,33 @@
 /*
- * Rosé Pine (base/main variant) — https://rosepinetheme.com/palette/
- * Adapted for hyprland/workspaces (was targeting sway/workspaces):
- * Hyprland's module marks the current workspace with class .active, Sway's
- * uses .focused. This file had been flipped to .focused for sway — flipped
- * back to .active here so it highlights correctly under Hyprland. Also
- * updated the .visible selector to exclude .active instead of .focused for
- * the same reason. hyprland/workspaces does support .urgent same as sway's
- * module, so that rule needed no change.
+ * Gruvbox Dark (medium contrast) — https://github.com/morhetz/gruvbox
+ * Hyprland's workspaces module marks the current workspace with class
+ * .active (Sway uses .focused). .urgent is the same in both.
  *
- * Font: uses CaskaydiaCove Nerd Font (the Nerd Fonts patched build of
- * Cascadia Code — can't keep the "Cascadia Code" name for licensing reasons,
- * but it's the font you're asking for). You need the font file installed on
- * the system for icons to render: on Fedora, `dnf search nerd-fonts` or grab
- * it from the CascadiaCode release on the ryanoasis/nerd-fonts GitHub repo.
+ * The accent color (current workspace) is yellow. To change it, change the
+ * "accent" line below. Hyprland borders, swaync and fuzzel use the same
+ * yellow, so change them too if you want them to match.
  */
-@define-color base     #191724; /* window background */
-@define-color surface  #1f1d2e; /* module/pill background */
-@define-color overlay  #26233a; /* hover state */
-@define-color muted    #6e6a86;
-@define-color subtle   #908caa;
-@define-color text     #ffffff; /* pure white text, per request (Rosé Pine's stock text is #e0def4 if you ever want the softer off-white back) */
-@define-color love     #eb6f92; /* critical / red */
-@define-color gold     #f6c177; /* warning */
-@define-color rose     #ebbcba;
-@define-color pine     #31748f; /* Rosé Pine's "terminal green" */
-@define-color foam     #9ccfd8; /* accent / "terminal cyan" */
-@define-color iris     #c4a7e7; /* accent / focus highlight */
-@define-color hl_low   #21202e;
-@define-color hl_med   #403d52;
-@define-color hl_high  #524f67;
+@define-color bg0_h  #1d2021; /* bar background */
+@define-color bg0    #282828; /* module/pill background */
+@define-color bg1    #3c3836; /* hover state */
+@define-color bg2    #504945; /* borders */
+@define-color gray   #928374;
+@define-color fg4    #a89984; /* other workspaces */
+@define-color fg0    #fbf1c7; /* text. Rose Pine setup used pure white #ffffff */
+@define-color red    #fb4934; /* critical */
+@define-color green  #b8bb26;
+@define-color yellow #fabd2f; /* warning */
+@define-color blue   #83a598;
+@define-color purple #d3869b;
+@define-color aqua   #8ec07c;
+@define-color orange #fe8019;
 
-/* Aliases so the rest of the file reads the same as before */
-@define-color bg   @base;
-@define-color pill @surface;
-@define-color fg   @text;
-@define-color ia1  @muted;
+/* Short names used in the rest of the file */
+@define-color bg     @bg0_h;
+@define-color pill   @bg0;
+@define-color fg     @fg0;
+@define-color ia1    @gray;
+@define-color accent @yellow;
 
 * {
   border: none;
@@ -42,7 +35,7 @@
   font-family: 'JetBrains Propo Nerd Font', 'JetBrains Nerd Font', 'JetBrains Mono Nerd Font', monospace;
   font-size: 15px;
   font-weight: bold;
-  color: @text;
+  color: @fg0;
   min-height: 0;
   transition: background-color .3s ease-out;
   }
@@ -61,7 +54,7 @@ window#waybar.hidden {
 
 #waybar > box {
   border-radius: 0px;
-  border-bottom: 1px solid @hl_med;
+  border-bottom: 1px solid @bg2;
   margin: 0px;
   background-color: @bg;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 1);
@@ -74,7 +67,7 @@ window#waybar.hidden {
 
 .modules-left {
   border-radius: 3px;
-  border: 1px solid @hl_med;
+  border: 1px solid @bg2;
   margin: 1px 2px 2px 2px;
   background-color: @pill;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 1);
@@ -116,7 +109,7 @@ button:hover {
 }
 
 #workspaces button {
-  color: @subtle;
+  color: @fg4;
   background-color: @pill;
   padding: 0px 4px;
   margin: 1px 1px;
@@ -125,24 +118,24 @@ button:hover {
 
 /* hyprland/workspaces uses .active for the current workspace (sway uses .focused) */
 #workspaces button.active {
-  background-color: @iris;
-  color: @base;
+  background-color: @accent;
+  color: @bg0_h;
 }
 
 /* shown on other outputs in a multi-monitor setup */
 #workspaces button.visible:not(.active) {
-  color: @foam;
+  color: @aqua;
   opacity: 0.8;
 }
 
 #workspaces button.urgent {
-  background-color: @love;
-  color: @base;
+  background-color: @red;
+  color: @bg0_h;
 }
 
 #workspaces button:hover {
-  background-color: @overlay;
-  color: @text;
+  background-color: @bg1;
+  color: @fg0;
   opacity: 1;
 }
 
@@ -188,7 +181,7 @@ button:hover {
 #backlight,
 #pulseaudio {
   border-radius: 3px;
-  border: 1px solid @hl_med;
+  border: 1px solid @bg2;
   margin: 1px 2px 2px 2px;
   padding: 0 6px;
   background-color: @pill;
@@ -216,7 +209,7 @@ tooltip label {
 
 #custom-separator {
   opacity: 0.3;
-  color: @muted;
+  color: @gray;
   padding-top: 2px;
   padding-left: 4px;
   padding-right: 4px;
@@ -245,20 +238,20 @@ animation: repeat;
 }
 
 #battery.warning {
-  color: @gold;
+  color: @yellow;
    background-color: @pill;
 }
 
 @keyframes blink2 {
   to {
     background-color: @pill;
-    color: @love;
+    color: @red;
   }
 }
 
 #battery.critical:not(.charging) {
   background-color: @pill;
-  color: @rose;
+  color: @orange;
   animation-name: blink2;
   animation-duration: 0.5s;
   animation-timing-function: steps(12);
@@ -269,10 +262,10 @@ animation: repeat;
 /* quick-settings BEGIN (added by quick-settings.sh, "revert" removes it) */
 /* Tray menus (Steam and other apps). The "*" rule in this file makes all
    text white, but the menu background comes from the GTK theme, which is
-   light. These rules give the menus a dark background. Rose Pine colors. */
+   light. These rules give the menus a dark background. Gruvbox colors. */
 menu {
-  background-color: #191724;
-  border: 1px solid #403d52;
+  background-color: #282828;
+  border: 1px solid #504945;
   padding: 4px 0;
 }
 menu menuitem {
@@ -280,23 +273,23 @@ menu menuitem {
   padding: 4px 12px;
 }
 menu menuitem label {
-  color: #e0def4;
+  color: #ebdbb2;
 }
 menu menuitem:hover {
-  background-color: #26233a;
+  background-color: #3c3836;
 }
 menu menuitem:disabled label {
-  color: #6e6a86;
+  color: #928374;
 }
 menu separator {
-  background-color: #403d52;
+  background-color: #504945;
   min-height: 1px;
   margin: 4px 0;
 }
 menu check,
 menu radio,
 menu arrow {
-  color: #e0def4;
+  color: #ebdbb2;
 }
 
 /* Night light and quick settings modules */
@@ -306,6 +299,6 @@ menu arrow {
 }
 #custom-nightlight.on,
 #custom-nightlight.auto {
-  color: #f6c177;
+  color: #fabd2f;
 }
 /* quick-settings END */

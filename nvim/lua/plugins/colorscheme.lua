@@ -1,16 +1,13 @@
 return {
   {
-    "rose-pine/neovim",
-    name = "rose-pine",
+    "ellisonleao/gruvbox.nvim",
     priority = 1000,
-    config = function()
-      require("rose-pine").setup({
-        variant = "main", -- "main" | "moon" | "dawn"
-      })
-    end,
+    opts = {
+      contrast = "", -- "" (medium) | "hard" | "soft"
+    },
   },
   {
     "LazyVim/LazyVim",
-    opts = { colorscheme = "rose-pine" },
+    opts = { colorscheme = "gruvbox" },
   },
 }

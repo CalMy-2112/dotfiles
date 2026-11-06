@@ -156,7 +156,7 @@
                 (group "users")
                 (home-directory "/home/calmy")
                 (shell (file-append zsh "/bin/zsh"))
-                (supplementary-groups '("wheel" "netdev" "audio" "video")))
+                (supplementary-groups '("wheel" "netdev" "audio" "video" "kvm")))
                %base-user-accounts))
 
   ;; tailscale: the "tailscale" command (the service only runs tailscaled).

@@ -354,7 +354,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     "xdg-desktop-portal" "xdg-desktop-portal-hyprland" "xdg-desktop-portal-gtk"
     "waybar" "fuzzel" "swaynotificationcenter" "libnotify"
     "grim" "slurp" "swappy" "wl-clipboard"
-    "dbus" "xdg-utils" "qt6ct" "openssh"
+    "dbus" "xdg-utils" "qt6ct" "openssh" "qemu"
     ;; gsettings, for the dark GTK theme and cursor lines in hyprland.lua
     "glib:bin" "gsettings-desktop-schemas" "dconf"
 
@@ -394,7 +394,7 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     ;; from npm (see ../panasonic/INSTALL.md, F5). nixd and hls are not here.
     "clang"                  ;clangd
     "gopls" "sqls" "lua-language-server" "shfmt"
-    "rust" "rust:cargo" "rust-analyzer"   ;rustaceanvim
+    "rust" "rust:cargo" "rust:tools" "rust-analyzer"   ;rustaceanvim
     "node"                   ;npm, for the servers above
     ;; molten-nvim and jupytext.nvim (Python host and Jupyter)
     "python-pynvim" "python-jupyter-client@7" "python-nbformat"

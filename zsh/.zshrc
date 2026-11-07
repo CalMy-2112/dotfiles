@@ -40,6 +40,7 @@ alias vi='hx'
 alias vim='hx'
 alias nvim='hx'
 alias gdb='gdb -q'
+alias vm='tmux has -t vm 2>/dev/null || tmux new -d -s vm ~/vm/run.sh'
 
 clear
 fastfetch

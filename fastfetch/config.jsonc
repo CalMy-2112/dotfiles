@@ -6,7 +6,7 @@
   },
   "modules": [
     "title", "separator", "os", "kernel", "uptime", "shell", "de", "wm",
-    "font", "terminal", "terminalfont", "cpu", "gpu", "disk",
+    "font", "terminal", "terminalfont", "cpu","memory", "gpu", "disk",
     "battery", "break", "colors"
   ]
 }

@@ -44,6 +44,18 @@ auto-format = true
 name = "nix"
 auto-format = true
 
+[[language]]
+name = "ocaml"
+auto-format = true
+language-servers = ["ocamllsp"]
+formatter = { command = "ocamlformat", args = ["--enable-outside-detected-project", "--impl", "-"] }
+
+[[language]]
+name = "ocaml-interface"
+auto-format = true
+language-servers = ["ocamllsp"]
+formatter = { command = "ocamlformat", args = ["--enable-outside-detected-project", "--intf", "-"] }
+
 # Python: pyright only, as in lsp.lua.
 # (The Helix default is ty, ruff, jedi and pylsp.)
 # pyright does not format, as in Neovim.

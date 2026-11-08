@@ -395,13 +395,14 @@ with the Nerd Font icons added, in normal, Mono and Propo forms.")
     "clang"                  ;clangd
     "gopls" "sqls" "lua-language-server" "shfmt"
     "rust" "rust:cargo" "rust:tools" "rust-analyzer"   ;rustaceanvim
-    "node"                   ;npm, for the servers above
+    "node" "nasm"                   ;npm, for the servers above
     ;; molten-nvim and jupytext.nvim (Python host and Jupyter)
     "python-pynvim" "python-jupyter-client@7" "python-nbformat"
     "python-ipykernel@6" "python-jupytext"
     ;; conjure + swank (your Lisp autocmd), metals (Scala)
     "sbcl" "openjdk"
 
+    "ocaml" "dune" "ocaml-findlib" "ocaml-lsp-server" "ocaml-merlin" "ocamlformat" "ocaml-utop" "ocaml-odoc"
     ;; Fonts and icons. Noto Sans CJK shows Japanese text.
     ;; breeze-icons: the Qt icon theme that Fedora used (breeze-dark).
     "font-nerd-jetbrains-mono" "font-google-noto" "font-google-noto-emoji"

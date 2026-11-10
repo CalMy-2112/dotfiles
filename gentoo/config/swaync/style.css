@@ -1,0 +1,70 @@
+/* swaync style for Gentoo (omen): night-train colors, the same as waybar.
+   swaync 0.12 and later load the default style first, then this file.
+   The @import line is for older versions. If the file is not there,
+   GTK ignores the line. */
+@import url("file:///etc/xdg/swaync/style.css");
+
+:root {
+  --cc-bg: rgba(14, 7, 38, 0.88);           /* mantle #0e0726 */
+  --noti-border-color: #3a3380;             /* surface2 */
+  --noti-bg: 30, 21, 72;                    /* surface0 #1e1548 */
+  --noti-bg-alpha: 0.94;
+  --noti-bg-darker: #140b33;                /* base */
+  --noti-bg-hover: #2a2160;                 /* surface1 */
+  --noti-bg-focus: rgba(42, 33, 96, 0.6);   /* surface1 */
+  --noti-close-bg: #3a3380;                 /* surface2 */
+  --noti-close-bg-hover: #2b3786;           /* indigo */
+  --text-color: #e4e0f7;                    /* text */
+  --text-color-disabled: #6f6aa8;           /* overlay */
+  --bg-selected: #47aeda;                   /* cyan */
+  --border-radius: 10px;
+  --font-size-body: 13px;
+  --font-size-summary: 14px;
+}
+
+* {
+  font-family: "JetBrainsMono Nerd Font Propo", "JetBrainsMono Nerd Font", sans-serif;
+}
+
+.control-center {
+  border: 1px solid rgba(71, 174, 218, 0.45);   /* cyan, a little faded */
+}
+
+/* Critical notifications: red border. */
+.notification.critical {
+  border: 1px solid #f0647f;
+}
+
+/* Quick settings buttons: dark pills, cyan when on. */
+.widget-buttons-grid flowboxchild > button {
+  background: #2a2160;
+  color: #e4e0f7;
+  border: none;
+  border-radius: 999px;
+  min-height: 36px;
+}
+.widget-buttons-grid flowboxchild > button:hover {
+  background: #3a3380;
+}
+.widget-buttons-grid flowboxchild > button.toggle:checked,
+.widget-buttons-grid flowboxchild > button:checked,
+.widget-buttons-grid flowboxchild > button.active {
+  background: #47aeda;
+  color: #0e0726;
+}
+.widget-buttons-grid flowboxchild > button.toggle:checked label,
+.widget-buttons-grid flowboxchild > button:checked label,
+.widget-buttons-grid flowboxchild > button.active label {
+  color: #0e0726;
+}
+
+/* Sliders (backlight, volume) */
+.control-center scale trough {
+  background: #3a3380;
+}
+.control-center scale trough highlight {
+  background: #47aeda;
+}
+.control-center scale slider {
+  background: #e4e0f7;
+}

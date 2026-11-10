@@ -1,0 +1,20 @@
+# alacritty.toml for Gentoo (omen). The same as the shared
+# alacritty/alacritty.toml, but with the night-train colors.
+[general]
+import = ["~/.config/alacritty/night-train.toml"]
+
+[window]
+dimensions = { columns = 204, lines = 54 }
+decorations = "None"
+padding = { x = 10, y = 10 }
+opacity = 0.85
+blur = true
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font" }
+size = 12
+
+[keyboard]
+bindings = [
+  { key = "S", mods = "Command", chars = "\u0001sa" },
+]

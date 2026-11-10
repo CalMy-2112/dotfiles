@@ -1,0 +1,22 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  // Gentoo (omen). The colors are the terminal colors from
+  // alacritty/night-train.toml: cyan #47aeda, magenta = lavender #ba94c3.
+  // logo.txt starts with "$1", so all of the logo uses color 1.
+  "logo": {
+    "type": "file",
+    "source": "~/.config/fastfetch/logo.txt",
+    "color": { "1": "cyan" }
+  },
+  "display": {
+    "color": {
+      "keys": "magenta",
+      "title": "cyan"
+    }
+  },
+  "modules": [
+    "title", "separator", "os", "kernel", "uptime", "shell", "de", "wm",
+    "font", "terminal", "terminalfont", "cpu", "memory", "gpu", "disk",
+    "battery", "break", "colors"
+  ]
+}

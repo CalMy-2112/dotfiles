@@ -1,0 +1,331 @@
+/*
+ * waybar style for Gentoo (omen): night-train colors from
+ * wallpapers/hyprland-girl.jpg. The layout is the same as the shared
+ * waybar/style.css (Guix, Gruvbox).
+ *
+ * The bar is a little transparent. Hyprland blurs what is behind it
+ * (layer rule "blur_waybar" in hyprland.lua).
+ *
+ * Hyprland marks the current workspace with class .active.
+ * To change the accent color, change the "accent" line below.
+ */
+@define-color crust    #0b0620;
+@define-color mantle   #0e0726; /* bar background */
+@define-color base     #140b33;
+@define-color surface0 #1e1548; /* module/pill background */
+@define-color surface1 #2a2160; /* hover state */
+@define-color surface2 #3a3380; /* borders */
+@define-color overlay  #6f6aa8; /* muted text */
+@define-color subtext  #aaa6d6; /* other workspaces */
+@define-color text     #e4e0f7;
+@define-color cyan     #47aeda;
+@define-color glow     #7fd8f2;
+@define-color sky      #6f97e6;
+@define-color lavender #ba94c3;
+@define-color pink     #e48ab8;
+@define-color red      #f0647f; /* critical */
+@define-color orange   #f2a272; /* warning */
+@define-color yellow   #f2cf8a;
+
+/* Short names used in the rest of the file */
+@define-color bg     alpha(@mantle, 0.82);
+@define-color pill   alpha(@surface0, 0.90);
+@define-color fg     @text;
+@define-color ia1    @overlay;
+@define-color accent @cyan;
+
+* {
+  border: none;
+  padding: 0px;
+  font-family: 'JetBrainsMono Nerd Font Propo', 'JetBrainsMono Nerd Font', monospace;
+  font-size: 15px;
+  font-weight: bold;
+  color: @text;
+  min-height: 0;
+  transition: background-color .3s ease-out;
+}
+
+
+/* --- Waybar ---*/
+window#waybar {
+  background-color: transparent;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#waybar > box {
+  border-radius: 0px;
+  border-bottom: 1px solid alpha(@cyan, 0.35);
+  margin: 0px;
+  background-color: @bg;
+  box-shadow: 0 1px 3px alpha(@crust, 0.9);
+  min-height: 15px;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+/* --- Modules --- */
+
+.modules-left {
+  border-radius: 4px;
+  border: 1px solid @surface2;
+  margin: 1px 2px 2px 2px;
+  background-color: @pill;
+  box-shadow: 0 1px 2px alpha(@crust, 0.9);
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+.modules-center {
+  margin: 0;
+}
+
+#right {
+  margin-right: 2px;
+}
+
+/* --- Workspaces --- */
+
+button {
+  box-shadow: inset 0 -3px transparent;
+  border: none;
+  border-radius: 0;
+  transition: 0.3s ease-in-out;
+}
+
+button:hover {
+  background: inherit;
+}
+
+#workspaces {
+  background-color: transparent;
+  margin: 2px;
+  padding: 0px;
+  border-radius: 4px;
+}
+
+#workspaces button {
+  color: @subtext;
+  background-color: transparent;
+  padding: 0px 4px;
+  margin: 1px 1px;
+  border-radius: 3px;
+}
+
+#workspaces button.active {
+  background-color: @accent;
+  color: @mantle;
+}
+
+/* shown on other outputs in a multi-monitor setup */
+#workspaces button.visible:not(.active) {
+  color: @lavender;
+  box-shadow: inset 0 -2px @lavender;
+}
+
+#workspaces button.urgent {
+  background-color: @red;
+  color: @mantle;
+}
+
+#workspaces button:hover {
+  background-color: @surface1;
+  color: @text;
+}
+
+#workspaces button.active:hover {
+  background-color: @glow;
+  color: @mantle;
+}
+
+
+/* --- General Modules --- */
+
+#custom-mpris,
+#memory,
+#cpu,
+#battery,
+#network,
+#backlight,
+#bluetooth,
+#pulseaudio,
+#clock {
+  min-width: 14px;
+  padding-left: 3px;
+  padding-right: 3px;
+  margin: 0 2px 0 2px;
+}
+
+#clock {
+  color: @text;
+}
+
+#tray {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+
+#backlight {
+  padding-right: 0px;
+  padding-left: 6px;
+}
+
+#bluetooth {
+  padding-left: 0px;
+}
+
+#bluetooth,
+#custom-mpris,
+#memory,
+#cpu,
+#battery,
+#network,
+#backlight,
+#pulseaudio {
+  border-radius: 4px;
+  border: 1px solid @surface2;
+  margin: 1px 2px 2px 2px;
+  padding: 0 6px;
+  background-color: @pill;
+  box-shadow: 0 1px 2px alpha(@crust, 0.9);
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+
+#bluetooth:hover,
+#network:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#battery:hover {
+  background-color: @surface1;
+}
+
+#memory,
+#cpu {
+  min-width: 45px;
+}
+
+tooltip {
+  padding: 4px;
+  background: @base;
+  font-size: 10px;
+  border: 1px solid alpha(@cyan, 0.5);
+  border-radius: 6px;
+}
+tooltip label {
+  color: @text;
+  font-weight: bold;
+}
+
+#custom-separator {
+  opacity: 0.5;
+  color: @overlay;
+  padding-top: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Specific Module */
+
+.hidden {
+  opacity: 0;
+}
+
+#custom-mpris {
+  color: @fg;
+  animation: repeat;
+  animation-name: blink;
+  animation-duration: 3s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes blink {
+  to {
+    color: @ia1;
+  }
+}
+
+#pulseaudio.muted,
+#bluetooth.off,
+#bluetooth.disabled,
+#network.disconnected {
+  color: @overlay;
+}
+
+#battery.charging,
+#battery.plugged {
+  color: @glow;
+}
+
+#battery.warning:not(.charging) {
+  color: @orange;
+}
+
+@keyframes blink2 {
+  to {
+    background-color: @pill;
+    color: @red;
+  }
+}
+
+#battery.critical:not(.charging) {
+  color: @orange;
+  animation-name: blink2;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* quick-settings BEGIN (added by quick-settings.sh, "revert" removes it) */
+/* Tray menus (Steam and other apps). The "*" rule in this file makes all
+   text light. These rules give the menus a dark background. */
+menu {
+  background-color: @base;
+  border: 1px solid @surface2;
+  padding: 4px 0;
+}
+menu menuitem {
+  background-color: transparent;
+  padding: 4px 12px;
+}
+menu menuitem label {
+  color: @text;
+}
+menu menuitem:hover {
+  background-color: @surface1;
+}
+menu menuitem:disabled label {
+  color: @overlay;
+}
+menu separator {
+  background-color: @surface2;
+  min-height: 1px;
+  margin: 4px 0;
+}
+menu check,
+menu radio,
+menu arrow {
+  color: @text;
+}
+
+/* Night light and quick settings modules */
+#custom-nightlight,
+#custom-quicksettings {
+  padding: 0 8px;
+}
+#custom-nightlight.on,
+#custom-nightlight.auto {
+  color: @yellow;
+}
+#custom-quicksettings {
+  color: @cyan;
+}
+/* quick-settings END */

@@ -96,7 +96,9 @@ set_btop() {
     mkdir -p "$(dirname "$btop_conf")"
     printf '%s = %s\n' "$1" "$2" >> "$btop_conf"
   fi
-  echo "btop:   $1 = $2"
+  if [ $dry = 0 ]; then
+    echo "btop:   $1 = $2"
+  fi
 }
 set_btop color_theme '"night-train"'
 set_btop theme_background False
@@ -105,9 +107,16 @@ set_btop theme_background False
 # there is none. Then Hyprland runs the script at the next start.
 if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ] && command -v gsettings >/dev/null; then
   run sh "$src/hypr/scripts/dark-theme.sh"
-  echo "gtk:    dark theme set with gsettings"
+  if [ $dry = 0 ]; then
+    echo "gtk:    dark theme set with gsettings"
+  fi
 else
   echo "gtk:    no D-Bus session. Hyprland sets the dark theme at the next start."
+fi
+
+if [ $dry = 1 ]; then
+  echo "Dry run done. Nothing changed."
+  exit 0
 fi
 
 if [ -d "$backup" ]; then

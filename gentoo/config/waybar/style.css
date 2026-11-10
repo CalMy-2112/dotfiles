@@ -38,7 +38,7 @@
   border: none;
   padding: 0px;
   font-family: 'JetBrainsMono Nerd Font Propo', 'JetBrainsMono Nerd Font', monospace;
-  font-size: 15px;
+  font-size: 12px; /* omen (1920x1080, scale 1). The Guix gram uses 15px. */
   font-weight: bold;
   color: @text;
   min-height: 0;

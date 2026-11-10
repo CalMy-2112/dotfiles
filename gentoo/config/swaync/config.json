@@ -26,7 +26,6 @@
   "widgets": [
     "buttons-grid",
     "backlight",
-    "backlight#keyboard",
     "volume",
     "mpris",
     "dnd",
@@ -84,11 +83,6 @@
     "backlight": {
       "label": "\uf185",
       "device": "amdgpu_bl1"
-    },
-    "backlight#keyboard": {
-      "label": "\uf11c",
-      "device": "hp::kbd_backlight",
-      "subsystem": "leds"
     },
     "volume": {
       "label": "\uf028"

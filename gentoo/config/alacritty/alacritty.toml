@@ -6,13 +6,14 @@ import = ["~/.config/alacritty/night-train.toml"]
 [window]
 dimensions = { columns = 204, lines = 54 }
 decorations = "None"
-padding = { x = 10, y = 10 }
+padding = { x = 8, y = 8 }
 opacity = 0.85
 blur = true
 
 [font]
 normal = { family = "JetBrainsMono Nerd Font" }
-size = 12
+# No size: the alacritty default (11.25) fits the omen screen.
+# The Guix gram uses size = 12.
 
 [keyboard]
 bindings = [

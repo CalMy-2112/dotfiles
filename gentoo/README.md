@@ -121,13 +121,24 @@ hyprland.lua does not set `GTK_THEME`. That variable also changes
 libadwaita programs and breaks their colors. If a GTK 3 program stays
 light, remove the `--` in front of the `GTK_THEME` line in hyprland.lua.
 
-## Check after the first login
+## Settings for the omen
 
-- Brightness slider in swaync (Super+S): the config uses `amdgpu_bl1` and
-  `hp::kbd_backlight`. If a slider is not there, the name is not correct.
-  Run `ls /sys/class/backlight /sys/class/leds` and change the `device`
-  values in `config/swaync/config.json`. The waybar module finds the
-  device itself.
+These values are different from the Guix gram, because the omen screen is
+1920x1080 at scale 1:
+
+- waybar font: 12px (gram: 15px)
+- alacritty font: default size 11.25 (gram: 12)
+- fuzzel: 8 lines (gram: 10)
+
+Facts about the omen (checked on 2026-11-10):
+
+- The screen backlight is `amdgpu_bl1`. The swaync slider (Super+S) uses
+  it. The waybar module finds the device itself.
+- `/sys/class/leds` has no keyboard backlight. The swaync config does not
+  have a keyboard slider.
+- GTK 4 is 4.20.4. GTK 4.20 and later get the dark mode from
+  `color-scheme`. Thus `gtk-4.0/settings.ini` does not need
+  `gtk-application-prefer-dark-theme`.
 - Monitors: hyprland.lua has `eDP-1` and the Sceptre F22, both at
   1920x1080@144. Run `hyprctl monitors` to see the real names and modes.
 - btop: if btop shows the old colors, close btop and run install.sh again.

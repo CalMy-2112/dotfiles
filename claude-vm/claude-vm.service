@@ -1,0 +1,43 @@
+[Unit]
+Description=Claude Code VM (QEMU as the user claudevm)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=claudevm
+Group=claudevm
+SupplementaryGroups=kvm
+RuntimeDirectory=claude-vm
+RuntimeDirectoryMode=0700
+UMask=0077
+# Load the host firewall for claudevm first ("+" = run as root).
+# If this fails, the VM does not start.
+ExecStartPre=+/usr/sbin/nft -f /etc/claude-vm/claudevm.nft
+ExecStart=/usr/local/lib/claude-vm/qemu.sh service
+ExecStop=/usr/local/lib/claude-vm/powerdown.sh
+TimeoutStopSec=120
+
+# Extra limits for the QEMU process. If the VM does not start, read
+# "journalctl -u claude-vm" and, if needed, remove these lines one at a time.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/claude-vm
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+DevicePolicy=closed
+DeviceAllow=/dev/kvm rw
+
+[Install]
+WantedBy=multi-user.target

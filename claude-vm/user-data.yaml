@@ -1,0 +1,109 @@
+#cloud-config
+# First-boot setup of the Claude VM (Debian 13 cloud image).
+# make-vm.sh puts in the @...@ values and writes the result to the seed.
+#
+# Users:
+#   admin  your admin user: sudo without password, login only with your key
+#   dev    the user for Claude Code: no sudo, no password, login only with your key
+# Neither user has a password, so nobody can "su" to admin or root.
+
+users:
+  - name: admin
+    gecos: VM admin
+    shell: /bin/bash
+    lock_passwd: true
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    ssh_authorized_keys:
+      - "@USER_KEY@"
+  - name: dev
+    gecos: Claude Code
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - "@USER_KEY@"
+
+disable_root: true
+ssh_pwauth: false
+
+# Fixed host key, made by make-vm.sh. The host knows it before the first
+# connection, so ssh never has to ask "are you sure?".
+ssh_deletekeys: true
+# Only types that are missing are made; ed25519 comes from ssh_keys below.
+ssh_genkeytypes: [ed25519]
+ssh_keys:
+  ed25519_private: |
+    @HOST_KEY_PRIV@
+  ed25519_public: "@HOST_KEY_PUB@"
+
+package_update: true
+package_upgrade: true
+packages:
+  - ufw
+  - unattended-upgrades
+  - git
+  - curl
+  - ca-certificates
+  - xz-utils
+  - tmux
+  - ripgrep
+  - jq
+  - python3
+  - python3-venv
+  - build-essential
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/10-claude-vm.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+      AllowUsers admin dev
+      AllowAgentForwarding no
+      AllowStreamLocalForwarding no
+      # "local" lets the host open ssh -L tunnels into the VM (for example to
+      # see a web server that Claude starts). It blocks -R, which would give
+      # the VM a way back to the host.
+      AllowTcpForwarding local
+      X11Forwarding no
+      PermitTunnel no
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    permissions: "0644"
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+
+runcmd:
+  - set -e
+  # Firewall in the guest (the second layer; the host has its own rule).
+  # 10.0.2.3 = QEMU's DNS, 10.0.2.2 port 67 = QEMU's DHCP. Everything else
+  # in private, Tailscale and link-local ranges is rejected. 10.0.2.2 is
+  # also the host's 127.0.0.1, so it must stay blocked.
+  - [ufw, default, deny, incoming]
+  - [ufw, default, allow, outgoing]
+  - [ufw, allow, in, 22/tcp]
+  - [ufw, allow, out, to, 10.0.2.3, port, "53"]
+  - [ufw, allow, out, to, 10.0.2.2, port, "67", proto, udp]
+  - [ufw, reject, out, to, 10.0.0.0/8]
+  - [ufw, reject, out, to, 172.16.0.0/12]
+  - [ufw, reject, out, to, 192.168.0.0/16]
+  - [ufw, reject, out, to, 100.64.0.0/10]
+  - [ufw, reject, out, to, 169.254.0.0/16]
+  # IPv6 rules only if the kernel has IPv6 (ufw refuses them otherwise).
+  - if [ -d /proc/sys/net/ipv6 ]; then ufw reject out to fc00::/7; ufw reject out to fe80::/10; fi
+  - [ufw, --force, enable]
+  - [systemctl, restart, ssh]
+  # Single-user Nix for dev: /nix belongs to dev, so there is no root
+  # nix-daemon that dev could use to get root.
+  - [install, -d, -o, dev, -g, dev, -m, "0755", /nix]
+  # Only on the first boot. Later boots have no seed.
+  - [touch, /etc/cloud/cloud-init.disabled]
+  # Last line: make-vm.sh looks for it in the console log. It is printed
+  # only if every step above worked (set -e).
+  - 'echo "CLAUDE-VM: first boot setup done" > /dev/console'
+
+power_state:
+  mode: poweroff
+  message: "Claude VM: first boot done, power off"
+  timeout: 60
+  condition: true

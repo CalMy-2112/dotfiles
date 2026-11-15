@@ -1,0 +1,92 @@
+#!/bin/bash
+# Control the Claude VM. make-vm.sh links this file to ~/.local/bin/claude-vm.
+set -euo pipefail
+
+STATE=/var/lib/claude-vm
+DISK=$STATE/disk.qcow2
+
+usage() {
+  cat <<'EOF'
+usage: claude-vm COMMAND
+  start            start the VM (systemd service claude-vm)
+  stop             shut the VM down (ACPI power button, then wait)
+  status           service status
+  ssh [cmd]        ssh as dev (the Claude user)
+  admin [cmd]      ssh as admin (sudo)
+  console          serial console of the running VM (leave with Ctrl-])
+  snapshot NAME    save the disk state (VM must be stopped)
+  restore NAME     go back to a saved state (VM must be stopped)
+  snapshots        list saved states
+  delete NAME      delete a saved state
+  destroy          delete the VM disk and all snapshots
+EOF
+}
+
+running() { systemctl is-active --quiet claude-vm; }
+need_stopped() {
+  if running; then
+    echo "The VM is running. Stop it first: claude-vm stop" >&2
+    exit 1
+  fi
+}
+as_vm() { (cd / && sudo -u claudevm "$@"); }
+
+cmd=${1:-help}
+[ $# -gt 0 ] && shift
+
+case $cmd in
+  start)
+    sudo systemctl start claude-vm
+    echo "started. ssh claude-vm (it can take about 20 s until ssh answers)"
+    ;;
+  stop)
+    sudo systemctl stop claude-vm
+    ;;
+  status)
+    systemctl status claude-vm --no-pager || true
+    ;;
+  ssh)
+    exec ssh claude-vm "$@"
+    ;;
+  admin)
+    exec ssh claude-vm-admin "$@"
+    ;;
+  console)
+    running || { echo "The VM is not running." >&2; exit 1; }
+    echo "Serial console. Leave with Ctrl-] (the VM keeps running)."
+    as_vm socat -,raw,echo=0,escape=0x1d UNIX-CONNECT:/run/claude-vm/serial.sock
+    ;;
+  snapshot)
+    need_stopped
+    as_vm qemu-img snapshot -c "${1:?snapshot NAME}" "$DISK"
+    echo "saved: ${1}"
+    ;;
+  restore)
+    need_stopped
+    as_vm qemu-img snapshot -a "${1:?restore NAME}" "$DISK"
+    echo "restored: ${1}"
+    ;;
+  snapshots)
+    as_vm qemu-img snapshot -l "$DISK"
+    ;;
+  delete)
+    need_stopped
+    as_vm qemu-img snapshot -d "${1:?delete NAME}" "$DISK"
+    echo "deleted: ${1}"
+    ;;
+  destroy)
+    need_stopped
+    read -r -p 'Type "destroy" to delete the VM disk and all its snapshots: ' answer
+    [ "$answer" = destroy ] || { echo "not deleted"; exit 1; }
+    sudo rm -f "$DISK" "$STATE/seed.img" "$STATE/first-boot.log"
+    rm -f "$HOME/.ssh/claude-vm_known_hosts"
+    echo "deleted. Make a new VM with make-vm.sh"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

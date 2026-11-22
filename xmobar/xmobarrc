@@ -23,12 +23,15 @@ Config
   , persistent       = True
   , overrideRedirect = True
   , commands =
-      [ Run XMonadLog
+      -- UnsafeXMonadLog keeps <action> tags (clickable workspace buttons).
+      -- Plain XMonadLog shows them as text, to stop window titles from
+      -- injecting commands. Safe here: the bar shows no window titles.
+      [ Run UnsafeXMonadLog
       , Run CommandReader "~/.config/xmobar/status.sh" "status"
       , Run Com "sh" ["-c", "~/.config/xmobar/trayer-padding.sh"] "trayerpad" 10
       ]
   , sepChar  = "%"
   , alignSep = "}{"
   -- <hspace=4/> before the tray: i3bar's gap between status text and tray.
-  , template = "<action=`~/.config/xmobar/ws-scroll.sh prev` button=4><action=`~/.config/xmobar/ws-scroll.sh next` button=5>%XMonadLog%</action></action>}{%status%<hspace=4/>%trayerpad%"
+  , template = "<action=`~/.config/xmobar/ws-scroll.sh prev` button=4><action=`~/.config/xmobar/ws-scroll.sh next` button=5>%UnsafeXMonadLog%</action></action>}{%status%<hspace=4/>%trayerpad%"
   }

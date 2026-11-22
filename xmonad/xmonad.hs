@@ -2,22 +2,24 @@
 -- Targets xmonad / xmonad-contrib 0.17+ (Ubuntu 22.04 and newer).
 -- Mod key = Super. Reload with Super+q after editing.
 
-import XMonad
-import qualified XMonad.StackSet as W
+import           XMonad
+import qualified XMonad.StackSet                 as W
 
-import XMonad.Actions.CycleWS (toggleWS)
-import XMonad.Hooks.EwmhDesktops (ewmh, ewmhFullscreen)
-import XMonad.Hooks.ManageDocks (avoidStruts)
-import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
-import XMonad.Hooks.StatusBar
-import XMonad.Hooks.StatusBar.PP
-import XMonad.Layout.NoBorders (smartBorders)
-import XMonad.Layout.Renamed (Rename (Replace), renamed)
-import XMonad.Layout.Spacing (Border (..), spacingRaw)
-import XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
-import XMonad.Util.ClickableWorkspaces (clickablePP)
-import XMonad.Util.EZConfig (additionalKeysP)
-import XMonad.Util.SpawnOnce (spawnOnce)
+import           XMonad.Actions.CycleWS          (toggleWS)
+import           XMonad.Hooks.EwmhDesktops       (ewmh, ewmhFullscreen)
+import           XMonad.Hooks.ManageDocks        (avoidStruts)
+import           XMonad.Hooks.ManageHelpers      (doCenterFloat, doFullFloat,
+                                                  isDialog, isFullscreen)
+import           XMonad.Hooks.StatusBar
+import           XMonad.Hooks.StatusBar.PP
+import           XMonad.Layout.NoBorders         (smartBorders)
+import           XMonad.Layout.Renamed           (Rename (Replace), renamed)
+import           XMonad.Layout.Spacing           (Border (..), spacingRaw)
+import           XMonad.Layout.ToggleLayouts     (ToggleLayout (..),
+                                                  toggleLayouts)
+import           XMonad.Util.ClickableWorkspaces (clickablePP)
+import           XMonad.Util.EZConfig            (additionalKeysP)
+import           XMonad.Util.SpawnOnce           (spawnOnce)
 
 ------------------------------------------------------------------------
 -- Apps
@@ -139,7 +141,7 @@ myPP = def
 -- border up to sit right under the fill.
 wsButton :: String -> String -> String -> String -> String
 wsButton border fill text name =
-  "<box type=Full width=1 mb=3 color=" ++ border ++ ">"
+  "<box type=Full width=1 mt=1 mb=3 color=" ++ border ++ ">"
     ++ xmobarColor text fill (" " ++ name ++ " ")
     ++ "</box>"
 

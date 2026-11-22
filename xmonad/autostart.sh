@@ -36,9 +36,10 @@ run xss-lock --transfer-sleep-lock -- i3lock -n -c 0b0b0b
 #   --distance = characters before it x character width
 #              = (1 space + 27 workspace chars + 5 separator chars) x 9.6px = 317
 #   (JetBrains Mono at 16px is 9.6px per character)
-#   --height   = xmobar's bar height (TopH 28), minus 1 for its bottom border
+#   --height   = icon size + a little. 22 keeps the icons (about 20px) inside
+#                the 28px bar (TopH 28) with room above and below.
 run trayer --edge top --align left --distancefrom left --distance 317 \
-  --widthtype request --height 27 --iconspacing 6 \
+  --widthtype request --height 22 --iconspacing 8 \
   --SetDockType true --SetPartialStrut false --expand true \
   --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
 

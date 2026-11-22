@@ -19,21 +19,22 @@ Config
   , overrideRedirect = True
   , commands =
       [ Run XMonadLog
-      , Run Com      "sh" ["-c", "~/.config/xmobar/wifi.sh"] "wifi" 50
+      , Run Com      "sh" ["-c", "~/.config/xmobar/wifi.sh"] "wifi" 10
       , Run Cpu      [ "-t", "cpu <total>%"
                      , "-L", "30", "-H", "70"
-                     , "--normal", "#6fd495", "--high", "#11ff7a" ] 20
+                     , "--normal", "#6fd495", "--high", "#11ff7a" ] 10
       , Run Memory   [ "-t", "mem <usedratio>%"
-                     , "-H", "80", "--high", "#11ff7a" ] 20
+                     , "-H", "80", "--high", "#11ff7a" ] 10
       , Run Battery  [ "-t", "<acstatus> <left>%"
                      , "-L", "20", "--low", "#afffd6"
                      , "--"
                      , "-O", "chg", "-i", "full", "-o", "bat"
-                     ] 50
-      , Run Date     "%a %d %b  %H:%M" "date" 100
+                     ] 10
+      , Run Date     "%a %d %b  %H:%M" "date" 10
       ]
   , sepChar  = "%"
   , alignSep = "}{"
   -- The single space before %XMonadLog% is counted in trayer's --distance.
-  , template = " %XMonadLog% }{ <fc=#b7c9b7>%wifi%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%cpu%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%memory%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc> "
+  -- Stats are packed close together; the clock keeps a wider gap.
+  , template = " %XMonadLog% }{ <fc=#b7c9b7>%wifi%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%cpu%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%memory%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc> "
   }

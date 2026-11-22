@@ -3,4 +3,4 @@
 # workspace numbers and the window title, where trayer sits on top of it.
 width=$(xprop -name panel 2>/dev/null |
   sed -n 's/.*program specified minimum size: \([0-9]*\) by.*/\1/p')
-[ -n "$width" ] && echo "<hspace=$width/>"
+[ -n "$width" ] && echo "<hspace=$((width + 4))/>"   # +4: a little air after the icons

@@ -1,0 +1,163 @@
+# cccru: neon green on black, from cccru.ca's style.css
+# (--bg #0b0b0b, --ink #e9efe9, --muted #b7c9b7, --neon #11ff7a,
+#  --neon-dim #0bbf5b, --darkened #2d732d), matching alacritty/cccru.toml.
+#
+# The editor background is left unset so alacritty's background (and its
+# transparency) shows through. For a solid background, change ui.background
+# to { bg = "bg" }.
+
+# ---- syntax ---------------------------------------------------------------
+
+"keyword"                  = "neon"
+"keyword.control"          = "neon"
+"keyword.operator"         = "dim"
+"keyword.function"         = "dim"
+"keyword.storage"          = "dim"
+"keyword.directive"        = "violet"
+
+"function"                 = "faint"
+"function.builtin"         = "faint"
+"function.macro"           = "violet"
+"function.special"         = "violet"
+
+"type"                     = "pale"
+"type.builtin"             = "pale"
+"type.enum.variant"        = "teal"
+"constructor"              = "pale"
+
+"string"                   = "mint"
+"string.regexp"            = "yellow"
+"string.special"           = "teal"
+"string.special.symbol"    = "violet"
+
+"constant"                 = "violet"
+"constant.builtin"         = "violet"
+"constant.numeric"         = "violet"
+"constant.character"       = "mint"
+"constant.character.escape" = "yellow"
+
+"variable"                 = "ink"
+"variable.builtin"         = "teal"
+"variable.parameter"       = "muted"
+"variable.other.member"    = "muted"
+
+"comment"                  = { fg = "comment", modifiers = ["italic"] }
+"operator"                 = "dim"
+"punctuation"              = "punct"
+"punctuation.delimiter"    = "punct"
+"punctuation.bracket"      = "punct"
+"punctuation.special"      = "dim"
+
+"namespace"                = "teal"
+"attribute"                = "yellow"
+"label"                    = "neon"
+"tag"                      = "neon"
+"special"                  = "violet"
+
+# ---- markup (markdown etc.) ------------------------------------------------
+
+"markup.heading"           = { fg = "neon", modifiers = ["bold"] }
+"markup.heading.marker"    = "dark"
+"markup.bold"              = { modifiers = ["bold"] }
+"markup.italic"            = { modifiers = ["italic"] }
+"markup.strikethrough"     = { modifiers = ["crossed_out"] }
+"markup.link.url"          = { fg = "teal", modifiers = ["underlined"] }
+"markup.link.text"         = "mint"
+"markup.link.label"        = "pale"
+"markup.quote"             = { fg = "muted", modifiers = ["italic"] }
+"markup.raw"               = "mint"
+"markup.list"              = "dim"
+
+# ---- diffs / version control -----------------------------------------------
+
+"diff.plus"                = "neon"
+"diff.minus"               = "red"
+"diff.delta"               = "yellow"
+"diff.delta.moved"         = "teal"
+
+# ---- diagnostics -----------------------------------------------------------
+
+"error"                    = "red"
+"warning"                  = "yellow"
+"info"                     = "teal"
+"hint"                     = "grey"
+
+"diagnostic.error"         = { underline = { color = "red", style = "curl" } }
+"diagnostic.warning"       = { underline = { color = "yellow", style = "curl" } }
+"diagnostic.info"          = { underline = { color = "teal", style = "curl" } }
+"diagnostic.hint"          = { underline = { color = "grey", style = "curl" } }
+"diagnostic.unnecessary"   = { modifiers = ["dim"] }
+"diagnostic.deprecated"    = { modifiers = ["crossed_out"] }
+
+# ---- editor UI -------------------------------------------------------------
+
+"ui.background"            = { }
+"ui.text"                  = "ink"
+"ui.text.focus"            = { fg = "neon", modifiers = ["bold"] }
+"ui.text.inactive"         = "comment"
+"ui.text.info"             = "ink"
+"ui.text.directory"        = "pale"
+
+"ui.cursor"                = { fg = "bg", bg = "muted" }
+"ui.cursor.primary"        = { fg = "bg", bg = "neon" }
+"ui.cursor.match"          = { fg = "neon", bg = "bg3", modifiers = ["bold"] }
+"ui.selection"             = { bg = "bg2" }
+"ui.selection.primary"     = { bg = "bg3" }
+"ui.highlight"             = { bg = "bg2" }
+"ui.cursorline.primary"    = { bg = "bg1" }
+"ui.cursorcolumn.primary"  = { bg = "bg1" }
+
+"ui.linenr"                = "grey"
+"ui.linenr.selected"       = { fg = "neon", modifiers = ["bold"] }
+"ui.gutter"                = { }
+
+"ui.statusline"            = { fg = "muted", bg = "bg1" }
+"ui.statusline.inactive"   = { fg = "grey", bg = "bg1" }
+"ui.statusline.normal"     = { fg = "bg", bg = "neon", modifiers = ["bold"] }
+"ui.statusline.insert"     = { fg = "bg", bg = "mint", modifiers = ["bold"] }
+"ui.statusline.select"     = { fg = "bg", bg = "violet", modifiers = ["bold"] }
+"ui.statusline.separator"  = "dark"
+
+"ui.bufferline"            = { fg = "muted", bg = "bg1" }
+"ui.bufferline.active"     = { fg = "bg", bg = "neon", modifiers = ["bold"] }
+"ui.bufferline.background" = { bg = "bg" }
+
+"ui.popup"                 = { fg = "ink", bg = "bg1" }
+"ui.popup.info"            = { fg = "ink", bg = "bg1" }
+"ui.window"                = "dark"
+"ui.help"                  = { fg = "ink", bg = "bg1" }
+"ui.menu"                  = { fg = "ink", bg = "bg1" }
+"ui.menu.selected"         = { fg = "neon", bg = "bg3", modifiers = ["bold"] }
+"ui.menu.scroll"           = { fg = "dark", bg = "bg1" }
+"ui.picker.header"         = { fg = "neon", modifiers = ["bold"] }
+
+"ui.virtual.whitespace"    = "bg3"
+"ui.virtual.indent-guide"  = "bg2"
+"ui.virtual.ruler"         = { bg = "bg1" }
+"ui.virtual.inlay-hint"    = { fg = "grey", modifiers = ["italic"] }
+"ui.virtual.wrap"          = "grey"
+"ui.virtual.jump-label"    = { fg = "violet", modifiers = ["bold"] }
+
+"ui.debug.breakpoint"      = "red"
+"ui.debug.active"          = "yellow"
+
+[palette]
+bg      = "#0b0b0b"   # --bg
+bg1     = "#121a14"   # status line, popups, cursor line
+bg2     = "#1a2a1e"   # selections, indent guides
+bg3     = "#1f4a2c"   # primary selection (same as alacritty's selection)
+dark    = "#2d732d"   # --darkened
+ink     = "#e9efe9"   # --ink
+muted   = "#b7c9b7"   # --muted
+neon    = "#11ff7a"   # --neon
+dim     = "#0bbf5b"   # --neon-dim
+mint    = "#6fd495"
+pale    = "#9bd8ae"
+faint   = "#afffd6"
+teal    = "#6fd4b8"
+comment = "#4f6b55"
+grey    = "#4a5a4a"
+punct   = "#7a8f7a"
+violet  = "#c3a6ff"
+red     = "#ff6b6b"
+yellow  = "#d7ff7a"

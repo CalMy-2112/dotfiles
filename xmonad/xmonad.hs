@@ -51,7 +51,7 @@ cFaint   = "#afffd6"
 
 myLayout = avoidStruts . smartBorders . toggleLayouts Full $ tall ||| wide ||| full
   where
-    gaps = spacingRaw True (Border 4 4 4 4) True (Border 4 4 4 4) True
+    gaps = spacingRaw True (Border 6 6 6 6) True (Border 6 6 6 6) True
     tall = renamed [Replace "Tall"] . gaps $ Tall 1 (3 / 100) (1 / 2)
     wide = renamed [Replace "Wide"] . gaps $ Mirror (Tall 1 (3 / 100) (1 / 2))
     full = renamed [Replace "Full"] Full
@@ -134,7 +134,7 @@ myStartupHook = spawnOnce "~/.config/xmonad/autostart.sh"
 myConfig = def
   { modMask            = mod4Mask      -- Super
   , terminal           = myTerminal
-  , borderWidth        = 2
+  , borderWidth        = 3
   , normalBorderColor  = cDark
   , focusedBorderColor = cNeon
   , focusFollowsMouse  = True

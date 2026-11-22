@@ -1,0 +1,13 @@
+! ~/.Xresources: loaded by ~/.xinitrc (xrdb -merge) before xmonad starts.
+! HiDPI for the gram (2560x1600, 16"). 96 = 1x, 144 = 1.5x, 192 = 2x.
+! Alacritty, GTK apps, Qt apps and rofi read Xft.dpi. If you change it,
+! also change Xcursor.size (24 per 1x) and the xmobar font/height.
+Xft.dpi:       144
+Xft.antialias: true
+Xft.hinting:   true
+Xft.hintstyle: hintslight
+Xft.rgba:      rgb
+Xft.lcdfilter: lcddefault
+
+Xcursor.theme: Yaru
+Xcursor.size:  36

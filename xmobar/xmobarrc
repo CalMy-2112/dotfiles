@@ -1,14 +1,15 @@
 -- ~/.config/xmobar/xmobarrc  (colours from cccru.ca: neon green on black)
--- xmobar 0.45+ (Ubuntu 23.04+) uses Pango font names like below.
--- On Ubuntu 22.04 (xmobar 0.44) use: font = "xft:JetBrainsMono Nerd Font:bold:size=10"
+-- Sized for 1.5x (Xft.dpi 144): font in pixels, bar 36px high. For 2x use
+-- 26px and 48, and change trayer's --height in xmonad/autostart.sh to match.
 
 Config
-  { font             = "JetBrainsMono Nerd Font Bold 10"
+  { font             = "JetBrainsMono Nerd Font Bold 20px"
   , bgColor          = "#0b0b0b"
   , fgColor          = "#e9efe9"
   , border           = BottomB
   , borderColor      = "#2d732d"
-  , position         = TopSize L 90 24     -- left 90% of the top edge; trayer has the rest
+  , position         = TopH 36           -- full width; trayer sits on its right end
+  , textOffset       = -1                -- centre text vertically
   , lowerOnStart     = True
   , hideOnStart      = False
   , allDesktops      = True
@@ -27,8 +28,9 @@ Config
                      , "-O", "chg", "-i", "full", "-o", "bat"
                      ] 50
       , Run Date     "%a %d %b  %H:%M" "date" 100
+      , Run Com      "sh" ["-c", "~/.config/xmobar/trayer-padding.sh"] "trayerpad" 10
       ]
   , sepChar  = "%"
   , alignSep = "}{"
-  , template = " %XMonadLog% }{ <fc=#b7c9b7>%cpu%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%memory%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc> "
+  , template = "  %XMonadLog% }{ <fc=#b7c9b7>%cpu%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%memory%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc>  %trayerpad%"
   }

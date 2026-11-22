@@ -32,10 +32,12 @@ run dunst
 xset s 600 600
 run xss-lock --transfer-sleep-lock -- i3lock -n -c 0b0b0b
 
-# System tray: sits in the right 10% of the top bar (xmobar takes the left 90%)
-run trayer --edge top --align right --widthtype percent --width 10 \
-  --height 24 --SetDockType true --SetPartialStrut true --expand true \
-  --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
+# System tray: on top of the right end of xmobar, as wide as its icons.
+# xmobar/trayer-padding.sh keeps the bar's text clear of it.
+# --height must match xmobar's bar height (36 at 1.5x).
+run trayer --edge top --align right --widthtype request --height 36 \
+  --iconspacing 8 --padding 8 --SetDockType true --SetPartialStrut true \
+  --expand true --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
 
 # Tray applets (give trayer a moment to start)
 sleep 1

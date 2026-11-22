@@ -1,0 +1,93 @@
+# yazi theme for Gentoo (omen), night-train colors.
+# Other items (file types, icons) use the 16 terminal colors from
+# alacritty/night-train.toml.
+#
+# Some keys changed between yazi versions. This file has the old and the
+# new names. yazi ignores the names that it does not know:
+#   yazi 25.x: [mgr] hovered, preview_hovered
+#   yazi 26.x: [indicator] current, preview
+
+[mgr]
+cwd = { fg = "#47aeda", bold = true }
+hovered         = { fg = "#0e0726", bg = "#47aeda", bold = true }
+preview_hovered = { underline = true }
+find_keyword  = { fg = "#f2cf8a", bold = true, italic = true, underline = true }
+find_position = { fg = "#ba94c3", bg = "reset", bold = true, italic = true }
+marker_copied   = { fg = "#66d9a8", bg = "#66d9a8" }
+marker_cut      = { fg = "#f0647f", bg = "#f0647f" }
+marker_marked   = { fg = "#7fd8f2", bg = "#7fd8f2" }
+marker_selected = { fg = "#ba94c3", bg = "#ba94c3" }
+count_copied   = { fg = "#0e0726", bg = "#66d9a8" }
+count_cut      = { fg = "#0e0726", bg = "#f0647f" }
+count_selected = { fg = "#0e0726", bg = "#ba94c3" }
+border_symbol = "│"
+border_style  = { fg = "#3a3380" }
+
+[indicator]
+parent  = { fg = "#e4e0f7", bg = "#2a2160" }
+current = { fg = "#0e0726", bg = "#47aeda", bold = true }
+preview = { underline = true }
+
+[tabs]
+active   = { fg = "#0e0726", bg = "#47aeda", bold = true }
+inactive = { fg = "#aaa6d6", bg = "#2a2160" }
+
+[mode]
+normal_main = { fg = "#0e0726", bg = "#47aeda", bold = true }
+normal_alt  = { fg = "#47aeda", bg = "#2a2160" }
+select_main = { fg = "#0e0726", bg = "#ba94c3", bold = true }
+select_alt  = { fg = "#ba94c3", bg = "#2a2160" }
+unset_main  = { fg = "#0e0726", bg = "#f0647f", bold = true }
+unset_alt   = { fg = "#f0647f", bg = "#2a2160" }
+
+[status]
+perm_sep   = { fg = "#6f6aa8" }
+perm_type  = { fg = "#6f97e6" }
+perm_read  = { fg = "#f2cf8a" }
+perm_write = { fg = "#f0647f" }
+perm_exec  = { fg = "#66d9a8" }
+progress_label  = { fg = "#e4e0f7", bold = true }
+progress_normal = { fg = "#47aeda", bg = "#2a2160" }
+progress_error  = { fg = "#f0647f", bg = "#2a2160" }
+
+[which]
+mask            = { bg = "#140b33" }
+cand            = { fg = "#7fd8f2" }
+rest            = { fg = "#6f6aa8" }
+desc            = { fg = "#ba94c3" }
+separator_style = { fg = "#3a3380" }
+
+[confirm]
+border = { fg = "#47aeda" }
+title  = { fg = "#47aeda" }
+
+[spot]
+border   = { fg = "#47aeda" }
+title    = { fg = "#47aeda" }
+tbl_col  = { fg = "#6f97e6" }
+tbl_cell = { fg = "#0e0726", bg = "#ba94c3" }
+
+[notify]
+title_info  = { fg = "#66d9a8" }
+title_warn  = { fg = "#f2a272" }
+title_error = { fg = "#f0647f" }
+
+[pick]
+border = { fg = "#47aeda" }
+active = { fg = "#ba94c3", bold = true }
+
+[input]
+border = { fg = "#47aeda" }
+
+[cmp]
+border = { fg = "#47aeda" }
+active = { fg = "#0e0726", bg = "#47aeda" }
+
+[tasks]
+border  = { fg = "#47aeda" }
+hovered = { fg = "#ba94c3", bold = true }
+
+[help]
+border  = { fg = "#47aeda" }
+chord   = { fg = "#7fd8f2" }
+hovered = { fg = "#0e0726", bg = "#47aeda", bold = true }

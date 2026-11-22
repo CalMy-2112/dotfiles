@@ -1,0 +1,60 @@
+# night-train: colors from wallpapers/hyprland-girl.jpg (Gentoo theme).
+# yazi, btop, fastfetch and the shell use these 16 colors too.
+
+[colors.primary]
+background = '#140b33'
+foreground = '#e4e0f7'
+dim_foreground = '#aaa6d6'
+bright_foreground = '#ffffff'
+
+[colors.cursor]
+text = '#140b33'
+cursor = '#7fd8f2'
+
+[colors.vi_mode_cursor]
+text = '#140b33'
+cursor = '#ba94c3'
+
+[colors.selection]
+text = 'CellForeground'
+background = '#2b3786'
+
+[colors.search.matches]
+foreground = '#140b33'
+background = '#ba94c3'
+
+[colors.search.focused_match]
+foreground = '#140b33'
+background = '#47aeda'
+
+[colors.hints.start]
+foreground = '#140b33'
+background = '#f2cf8a'
+
+[colors.hints.end]
+foreground = '#140b33'
+background = '#ba94c3'
+
+[colors.footer_bar]
+foreground = '#140b33'
+background = '#aaa6d6'
+
+[colors.normal]
+black   = '#2a2160'
+red     = '#f0647f'
+green   = '#66d9a8'
+yellow  = '#f2cf8a'
+blue    = '#6f97e6'
+magenta = '#ba94c3'
+cyan    = '#47aeda'
+white   = '#c9c4ea'
+
+[colors.bright]
+black   = '#6a65a3'
+red     = '#ff8aa2'
+green   = '#8ef0c4'
+yellow  = '#ffe2a8'
+blue    = '#93b4f5'
+magenta = '#d9b8e3'
+cyan    = '#7fd8f2'
+white   = '#f4f1ff'

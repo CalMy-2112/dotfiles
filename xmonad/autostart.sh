@@ -11,7 +11,7 @@ dots="$(dirname "$(dirname "$(readlink -f "$0")")")"
 xsetroot -cursor_name left_ptr
 
 # Wallpaper from the repo's wallpapers/ folder
-wall="$dots/wallpapers/night-train.jpg"
+wall="$dots/wallpapers/hyprland-girl.jpg"
 if [ -f "$wall" ]; then
   feh --no-fehbg --bg-fill "$wall"
 else

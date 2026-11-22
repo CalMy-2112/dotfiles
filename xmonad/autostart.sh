@@ -42,8 +42,12 @@ run trayer --edge top --align left --distancefrom left --distance 396 \
   --SetDockType true --SetPartialStrut false --expand true \
   --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
 
-# Tray applets (give trayer a moment to start)
+# Tray applets (give trayer a moment to start). Most applets now use the
+# StatusNotifier tray standard, which trayer doesn't speak; snixembed
+# translates them into icons trayer can show.
 sleep 1
+run snixembed
+sleep 0.5
 run nm-applet
 run blueman-applet
 run pasystray

@@ -13,7 +13,7 @@ sudo apt install -y \
   xmonad libghc-xmonad-contrib-dev xmobar \
   rofi trayer feh picom dunst flameshot \
   xss-lock i3lock x11-xserver-utils x11-utils xserver-xorg xinit \
-  network-manager-gnome blueman pasystray pavucontrol \
+  network-manager-gnome blueman pasystray pavucontrol snixembed \
   brightnessctl playerctl policykit-1-gnome
 # alacritty is left out: 0.16.1 is already installed
 

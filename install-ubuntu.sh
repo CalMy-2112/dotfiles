@@ -39,6 +39,10 @@ link tmux/.tmux.conf.local  "$HOME/.tmux.conf.local"
 link zsh/.zshrc             "$HOME/.zshrc"
 link x11/xinitrc            "$HOME/.xinitrc"
 link x11/Xresources         "$HOME/.Xresources"
+# helix: link files one by one so ~/.config/helix/runtime (grammars) stays put
+link helix/config.toml       "$HOME/.config/helix/config.toml"
+link helix/languages.toml    "$HOME/.config/helix/languages.toml"
+link helix/themes            "$HOME/.config/helix/themes"
 chmod +x "$dots/xmonad/autostart.sh" "$dots/xmonad/build" "$dots/xmobar/trayer-padding.sh" "$dots/xmobar/wifi.sh" "$dots/x11/xinitrc"
 
 # oh-my-zsh and oh-my-tmux themselves are not in this repo

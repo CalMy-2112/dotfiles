@@ -9,10 +9,6 @@
 
 Config
   { font             = "JetBrainsMono Nerd Font 10"
-    -- fn=1: a space in this font is exactly 4px wide (0.6em of 6.667px).
-    -- Used for i3's 4px padding inside workspace buttons, so the padding
-    -- gets the button's fill colour.
-  , additionalFonts  = [ "JetBrainsMono Nerd Font 6.667px" ]
   , bgColor          = "#0b0b0b"
   , fgColor          = "#e9efe9"
   , position         = TopH 24

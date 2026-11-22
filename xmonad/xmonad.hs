@@ -114,7 +114,7 @@ myKeys =
 
 -- Left side of the bar: Qubes OS's i3bar workspace buttons in cccru colours.
 -- Only workspaces in use are shown (current, with windows, or urgent), each
--- as a box with a 1px border and 4px padding, 1px apart, like i3bar.
+-- as a filled box with a 1px border, 1px apart, like i3bar.
 -- Clicking a button switches to it (clickablePP, needs xdotool). No layout
 -- name or window title, as in i3bar.
 --            border      fill    text       (i3bar colours class)
@@ -130,16 +130,18 @@ myPP = def
   , ppOrder           = take 1                            -- workspaces only
   }
 
--- A workspace button: 1px border box around "<4px>name<4px>" on the fill
--- colour. The 4px pads are spaces in xmobar's second font (fn=1), which is
--- sized so a space is exactly 4px, so they get the fill colour too.
+-- A workspace button: " name " filled with the fill colour, inside a 1px
+-- border box.
+-- xmobar paints a text's background only as tall as that text's font, so
+-- the padding spaces use the same font as the number; a smaller font for
+-- them gave a cross-shaped fill. The fill is the font's line height (rows
+-- 1-18 of the 24px bar), and the box is 23px tall, so mb=3 pulls its bottom
+-- border up to sit right under the fill.
 wsButton :: String -> String -> String -> String -> String
 wsButton border fill text name =
-  "<box type=Full width=1 color=" ++ border ++ ">"
-    ++ xmobarColor text fill (pad4 ++ name ++ pad4)
+  "<box type=Full width=1 mb=3 color=" ++ border ++ ">"
+    ++ xmobarColor text fill (" " ++ name ++ " ")
     ++ "</box>"
-  where
-    pad4 = "<fn=1> </fn>"
 
 mySB :: StatusBarConfig
 mySB = statusBarProp "xmobar" (clickablePP myPP)

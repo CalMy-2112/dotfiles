@@ -5,5 +5,8 @@
 # $1 is the path xmonad wants the compiled binary at.
 set -e
 out="$1"
-exec /usr/bin/ghc --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 \
+# -package-env - : ignore ~/.ghc/*/environments/default. "cabal install --lib"
+# (for helix's language server) writes one there for ghcup's GHC, and it would
+# make this GHC look for ghcup's packages and fail.
+exec /usr/bin/ghc -package-env - --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 \
   -outputdir "$(dirname "$out")/build-$(uname -m)-linux" -o "$out"

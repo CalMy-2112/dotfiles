@@ -39,7 +39,7 @@ link tmux/.tmux.conf.local  "$HOME/.tmux.conf.local"
 link zsh/.zshrc             "$HOME/.zshrc"
 link x11/xinitrc            "$HOME/.xinitrc"
 link x11/Xresources         "$HOME/.Xresources"
-chmod +x "$dots/xmonad/autostart.sh" "$dots/xmonad/build" "$dots/xmobar/trayer-padding.sh" "$dots/x11/xinitrc"
+chmod +x "$dots/xmonad/autostart.sh" "$dots/xmonad/build" "$dots/xmobar/trayer-padding.sh" "$dots/xmobar/wifi.sh" "$dots/x11/xinitrc"
 
 # oh-my-zsh and oh-my-tmux themselves are not in this repo
 [ -d "$HOME/.oh-my-zsh" ] || echo "NOTE: ~/.oh-my-zsh is missing; install oh-my-zsh for the zsh theme"

@@ -1,6 +1,6 @@
 #!/bin/sh
-# Prints an empty space as wide as trayer, so xmobar's right-hand text ends
-# where the tray icons begin (trayer sits on top of the bar's right end).
+# Prints an empty space as wide as trayer. xmonad puts it between the
+# workspace numbers and the window title, where trayer sits on top of it.
 width=$(xprop -name panel 2>/dev/null |
   sed -n 's/.*program specified minimum size: \([0-9]*\) by.*/\1/p')
-echo "<hspace=$(( ${width:-0} + 8 ))/>"
+[ -n "$width" ] && echo "<hspace=$width/>"

@@ -32,12 +32,15 @@ run dunst
 xset s 600 600
 run xss-lock --transfer-sleep-lock -- i3lock -n -c 0b0b0b
 
-# System tray: on top of the right end of xmobar, as wide as its icons.
-# xmobar/trayer-padding.sh keeps the bar's text clear of it.
-# --height must match xmobar's bar height (36 at 1.5x).
-run trayer --edge top --align right --widthtype request --height 36 \
-  --iconspacing 8 --padding 8 --SetDockType true --SetPartialStrut true \
-  --expand true --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
+# System tray: in the bar, between the workspace numbers and the window title.
+#   --distance = characters before it x character width
+#              = (1 space + 27 workspace chars + 5 separator chars) x 12px = 396
+#   (JetBrains Mono at 20px is 12px per character)
+#   --height   = xmobar's bar height (TopH 32), minus 1 for its bottom border
+run trayer --edge top --align left --distancefrom left --distance 396 \
+  --widthtype request --height 31 --iconspacing 6 \
+  --SetDockType true --SetPartialStrut false --expand true \
+  --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
 
 # Tray applets (give trayer a moment to start)
 sleep 1

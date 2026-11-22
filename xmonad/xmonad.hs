@@ -16,6 +16,7 @@ import XMonad.Layout.Renamed (Rename (Replace), renamed)
 import XMonad.Layout.Spacing (Border (..), spacingRaw)
 import XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
 import XMonad.Util.EZConfig (additionalKeysP)
+import XMonad.Util.Loggers (logCmd)
 import XMonad.Util.SpawnOnce (spawnOnce)
 
 ------------------------------------------------------------------------
@@ -111,17 +112,28 @@ myKeys =
 ------------------------------------------------------------------------
 -- Status bar (xmobar reads ~/.config/xmobar/xmobarrc)
 
+-- Left side of the bar:   [ 1  2  3 ... 9 ]  |  [tray icons]  |  window title
+-- Every workspace is exactly 3 characters wide (" n "), so the workspace
+-- block is always 27 characters. trayer is placed at a fixed pixel offset
+-- right after it (see the trayer line in autostart.sh), and the padding
+-- logger leaves a gap as wide as the tray before the title.
 myPP :: PP
 myPP = def
-  { ppCurrent         = xmobarColor cBg cNeon . wrap " " " "   -- black on neon, like a lit button
-  , ppVisible         = xmobarColor cMint "" . wrap "(" ")"
-  , ppHidden          = xmobarColor cMuted ""
-  , ppHiddenNoWindows = xmobarColor cDark ""
-  , ppUrgent          = xmobarColor cBg cFaint . wrap "!" "!"
-  , ppLayout          = xmobarColor cNeonDim ""
+  { ppCurrent         = xmobarColor cBg cNeon . pad3   -- black on neon, like a lit button
+  , ppVisible         = xmobarColor cBg cMint . pad3   -- shown on another monitor
+  , ppHidden          = xmobarColor cMuted "" . pad3
+  , ppHiddenNoWindows = xmobarColor cDark "" . pad3
+  , ppUrgent          = xmobarColor cBg cFaint . pad3
+  , ppWsSep           = ""
   , ppTitle           = xmobarColor cPale "" . shorten 70
   , ppSep             = xmobarColor cDark "" "  |  "
+  , ppExtras          = [logCmd "~/.config/xmobar/trayer-padding.sh"]
+  , ppOrder           = \xs -> case xs of
+                          (ws : _layout : title : extras) -> ws : extras ++ [title]
+                          _                               -> xs
   }
+  where
+    pad3 = wrap " " " "
 
 mySB :: StatusBarConfig
 mySB = statusBarProp "xmobar" (pure myPP)
@@ -134,7 +146,7 @@ myStartupHook = spawnOnce "~/.config/xmonad/autostart.sh"
 myConfig = def
   { modMask            = mod4Mask      -- Super
   , terminal           = myTerminal
-  , borderWidth        = 3
+  , borderWidth        = 2
   , normalBorderColor  = cDark
   , focusedBorderColor = cNeon
   , focusFollowsMouse  = True

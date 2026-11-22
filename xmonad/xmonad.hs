@@ -52,7 +52,7 @@ cFaint   = "#afffd6"
 
 myLayout = avoidStruts . smartBorders . toggleLayouts Full $ tall ||| wide ||| full
   where
-    gaps = spacingRaw True (Border 6 6 6 6) True (Border 6 6 6 6) True
+    gaps = spacingRaw True (Border 4 4 4 4) True (Border 4 4 4 4) True
     tall = renamed [Replace "Tall"] . gaps $ Tall 1 (3 / 100) (1 / 2)
     wide = renamed [Replace "Wide"] . gaps $ Mirror (Tall 1 (3 / 100) (1 / 2))
     full = renamed [Replace "Full"] Full

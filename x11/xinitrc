@@ -9,7 +9,7 @@
 
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=xmonad
-export XCURSOR_SIZE=30            # keep in step with Xcursor.size in ~/.Xresources
+export XCURSOR_SIZE=24            # keep in step with Xcursor.size in ~/.Xresources
 export XCURSOR_THEME=Yaru
 
 # DPI, fonts and cursor (see ~/.Xresources)

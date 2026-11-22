@@ -1,16 +1,16 @@
 -- ~/.config/xmobar/xmobarrc  (colours from cccru.ca: neon green on black)
--- Font: 12pt at Xft.dpi 120 (see x11/Xresources) = 20px. xmobar takes the
+-- Font: 12pt at Xft.dpi 96 (see x11/Xresources) = 16px. xmobar takes the
 -- size in pixels so it doesn't depend on how it reads DPI.
 -- If you change the font size or the bar height, also change the trayer
 -- line in xmonad/autostart.sh (its --height and --distance).
 
 Config
-  { font             = "JetBrainsMono Nerd Font Bold 20px"
+  { font             = "JetBrainsMono Nerd Font Bold 16px"
   , bgColor          = "#0b0b0b"
   , fgColor          = "#e9efe9"
   , border           = BottomB
   , borderColor      = "#2d732d"
-  , position         = TopH 32
+  , position         = TopH 28
   , textOffset       = -1                -- centre text vertically
   , lowerOnStart     = True
   , hideOnStart      = False

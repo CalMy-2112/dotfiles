@@ -93,6 +93,16 @@ formattingProvider = "stylish-haskell"
 
 
 [[language]]
+name = "elixir"
+language-servers = ["expert"]
+auto-format = true
+
+[[language]]
+name = "heex"
+language-servers = ["expert"]
+auto-format = true
+
+[[language]]
 name = "markdown"
 language-servers = ["harper-ls"]
 

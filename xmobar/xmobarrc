@@ -1,16 +1,21 @@
--- ~/.config/xmobar/xmobarrc  (colours from cccru.ca: neon green on black)
--- Font: 12pt at Xft.dpi 96 (see x11/Xresources) = 16px. xmobar takes the
--- size in pixels so it doesn't depend on how it reads DPI.
--- If you change the font size or the bar height, also change the trayer
--- line in xmonad/autostart.sh (its --height and --distance).
+-- ~/.config/xmobar/xmobarrc: Qubes OS's i3bar layout in cccru colours.
+--   left:  workspace buttons (only workspaces in use), click to switch,
+--          scroll to move between them
+--   right: status.sh (port of qubes-i3status), then the tray
+-- Font: JetBrains Mono 10pt (regular, as Qubes' bar font is regular).
+-- Height: i3bar's formula, font height (18px) + 3px above and below = 24.
+-- If you change the height, also change trayer's --height in
+-- xmonad/autostart.sh (height - 4, for i3's 2px tray padding).
 
 Config
-  { font             = "JetBrainsMono Nerd Font Bold 16px"
+  { font             = "JetBrainsMono Nerd Font 10"
+    -- fn=1: a space in this font is exactly 4px wide (0.6em of 6.667px).
+    -- Used for i3's 4px padding inside workspace buttons, so the padding
+    -- gets the button's fill colour.
+  , additionalFonts  = [ "JetBrainsMono Nerd Font 6.667px" ]
   , bgColor          = "#0b0b0b"
   , fgColor          = "#e9efe9"
-  , border           = BottomB
-  , borderColor      = "#2d732d"
-  , position         = TopH 28
+  , position         = TopH 24
   , textOffset       = -1                -- centre text vertically
   , lowerOnStart     = True
   , hideOnStart      = False
@@ -19,22 +24,11 @@ Config
   , overrideRedirect = True
   , commands =
       [ Run XMonadLog
-      , Run Com      "sh" ["-c", "~/.config/xmobar/wifi.sh"] "wifi" 10
-      , Run Cpu      [ "-t", "cpu <total>%"
-                     , "-L", "30", "-H", "70"
-                     , "--normal", "#6fd495", "--high", "#11ff7a" ] 10
-      , Run Memory   [ "-t", "mem <usedratio>%"
-                     , "-H", "80", "--high", "#11ff7a" ] 10
-      , Run Battery  [ "-t", "<acstatus> <left>%"
-                     , "-L", "20", "--low", "#afffd6"
-                     , "--"
-                     , "-O", "chg", "-i", "full", "-o", "bat"
-                     ] 10
-      , Run Date     "%a %d %b  %H:%M" "date" 10
+      , Run CommandReader "~/.config/xmobar/status.sh" "status"
+      , Run Com "sh" ["-c", "~/.config/xmobar/trayer-padding.sh"] "trayerpad" 10
       ]
   , sepChar  = "%"
   , alignSep = "}{"
-  -- The single space before %XMonadLog% is counted in trayer's --distance.
-  -- Stats are packed close together; the clock keeps a wider gap.
-  , template = " %XMonadLog% }{ <fc=#b7c9b7>%wifi%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%cpu%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%memory%</fc> <fc=#2d732d>|</fc> <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc> "
+  -- <hspace=4/> before the tray: i3bar's gap between status text and tray.
+  , template = "<action=`~/.config/xmobar/ws-scroll.sh prev` button=4><action=`~/.config/xmobar/ws-scroll.sh next` button=5>%XMonadLog%</action></action>}{%status%<hspace=4/>%trayerpad%"
   }

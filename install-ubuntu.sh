@@ -14,7 +14,8 @@ sudo apt install -y \
   rofi trayer feh picom dunst flameshot \
   xss-lock i3lock x11-xserver-utils x11-utils xserver-xorg xinit \
   network-manager-gnome blueman pasystray pavucontrol \
-  brightnessctl playerctl policykit-1-gnome
+  brightnessctl playerctl policykit-1-gnome \
+  xdotool wmctrl pulseaudio-utils alsa-utils
 # alacritty is left out: 0.16.1 is already installed
 
 link() {  # link <repo path> <target>
@@ -43,7 +44,7 @@ link x11/Xresources         "$HOME/.Xresources"
 link helix/config.toml       "$HOME/.config/helix/config.toml"
 link helix/languages.toml    "$HOME/.config/helix/languages.toml"
 link helix/themes            "$HOME/.config/helix/themes"
-chmod +x "$dots/xmonad/autostart.sh" "$dots/xmonad/build" "$dots/xmobar/trayer-padding.sh" "$dots/xmobar/wifi.sh" "$dots/x11/xinitrc"
+chmod +x "$dots/xmonad/autostart.sh" "$dots/xmonad/build" "$dots/xmobar/trayer-padding.sh" "$dots/xmobar/status.sh" "$dots/xmobar/ws-scroll.sh" "$dots/x11/xinitrc"
 
 # oh-my-zsh and oh-my-tmux themselves are not in this repo
 [ -d "$HOME/.oh-my-zsh" ] || echo "NOTE: ~/.oh-my-zsh is missing; install oh-my-zsh for the zsh theme"

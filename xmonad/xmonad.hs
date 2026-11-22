@@ -15,8 +15,8 @@ import XMonad.Layout.NoBorders (smartBorders)
 import XMonad.Layout.Renamed (Rename (Replace), renamed)
 import XMonad.Layout.Spacing (Border (..), spacingRaw)
 import XMonad.Layout.ToggleLayouts (ToggleLayout (..), toggleLayouts)
+import XMonad.Util.ClickableWorkspaces (clickablePP)
 import XMonad.Util.EZConfig (additionalKeysP)
-import XMonad.Util.Loggers (logCmd)
 import XMonad.Util.SpawnOnce (spawnOnce)
 
 ------------------------------------------------------------------------
@@ -112,31 +112,37 @@ myKeys =
 ------------------------------------------------------------------------
 -- Status bar (xmobar reads ~/.config/xmobar/xmobarrc)
 
--- Left side of the bar:   [ 1  2  3 ... 9 ]  |  [tray icons]  |  window title
--- Every workspace is exactly 3 characters wide (" n "), so the workspace
--- block is always 27 characters. trayer is placed at a fixed pixel offset
--- right after it (see the trayer line in autostart.sh), and the padding
--- logger leaves a gap as wide as the tray before the title.
+-- Left side of the bar: Qubes OS's i3bar workspace buttons in cccru colours.
+-- Only workspaces in use are shown (current, with windows, or urgent), each
+-- as a box with a 1px border and 4px padding, 1px apart, like i3bar.
+-- Clicking a button switches to it (clickablePP, needs xdotool). No layout
+-- name or window title, as in i3bar.
+--            border      fill    text       (i3bar colours class)
 myPP :: PP
 myPP = def
-  { ppCurrent         = xmobarColor cBg cNeon . pad3   -- black on neon, like a lit button
-  , ppVisible         = xmobarColor cBg cMint . pad3   -- shown on another monitor
-  , ppHidden          = xmobarColor cMuted "" . pad3
-  , ppHiddenNoWindows = xmobarColor cDark "" . pad3
-  , ppUrgent          = xmobarColor cBg cFaint . pad3
-  , ppWsSep           = ""
-  , ppTitle           = xmobarColor cPale "" . shorten 70
-  , ppSep             = xmobarColor cDark "" "  |  "
-  , ppExtras          = [logCmd "~/.config/xmobar/trayer-padding.sh"]
-  , ppOrder           = \xs -> case xs of
-                          (ws : _layout : title : extras) -> ws : extras ++ [title]
-                          _                               -> xs
+  { ppCurrent         = wsButton cNeonDim  cNeon  cBg     -- focused_workspace
+  , ppVisible         = wsButton cMint     cDark  cInk    -- active_workspace (other monitor)
+  , ppHidden          = wsButton cDark     cBg    cMuted  -- inactive_workspace
+  , ppHiddenNoWindows = const ""                          -- i3 hides empty workspaces
+  , ppUrgent          = wsButton "#ff6b6b" cFaint cBg     -- urgent_workspace
+  , ppWsSep           = "<hspace=1/>"
+  , ppSep             = ""
+  , ppOrder           = take 1                            -- workspaces only
   }
+
+-- A workspace button: 1px border box around "<4px>name<4px>" on the fill
+-- colour. The 4px pads are spaces in xmobar's second font (fn=1), which is
+-- sized so a space is exactly 4px, so they get the fill colour too.
+wsButton :: String -> String -> String -> String -> String
+wsButton border fill text name =
+  "<box type=Full width=1 color=" ++ border ++ ">"
+    ++ xmobarColor text fill (pad4 ++ name ++ pad4)
+    ++ "</box>"
   where
-    pad3 = wrap " " " "
+    pad4 = "<fn=1> </fn>"
 
 mySB :: StatusBarConfig
-mySB = statusBarProp "xmobar" (pure myPP)
+mySB = statusBarProp "xmobar" (clickablePP myPP)
 
 ------------------------------------------------------------------------
 

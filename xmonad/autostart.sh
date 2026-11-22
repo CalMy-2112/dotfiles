@@ -32,14 +32,12 @@ run dunst
 xset s 600 600
 run xss-lock --transfer-sleep-lock -- i3lock -n -c 0b0b0b
 
-# System tray: in the bar, between the workspace numbers and the window title.
-#   --distance = characters before it x character width
-#              = (1 space + 27 workspace chars + 5 separator chars) x 9.6px = 317
-#   (JetBrains Mono at 16px is 9.6px per character)
-#   --height   = icon size + a little. 22 keeps the icons (about 20px) inside
-#                the 28px bar (TopH 28) with room above and below.
-run trayer --edge top --align left --distancefrom left --distance 317 \
-  --widthtype request --height 22 --iconspacing 8 \
+# System tray: at the right end of the bar, like i3bar. i3's default tray
+# padding is 2px above, below and to the right, so in the 24px bar:
+#   --height 20 (icons 20px), --distance 2 from the top, --margin 2 from
+#   the right edge. xmobar/trayer-padding.sh keeps the status text clear.
+run trayer --edge top --align right --margin 2 --distancefrom top --distance 2 \
+  --widthtype request --height 20 --iconspacing 2 \
   --SetDockType true --SetPartialStrut false --expand true \
   --transparent true --alpha 0 --tint 0x0b0b0b --monitor primary
 

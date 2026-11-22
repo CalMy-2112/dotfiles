@@ -22,12 +22,17 @@ ZSH_CACHE_DIR="$HOME/.cache/oh-my-zsh"
 [[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
 zstyle ':omz:update' mode disabled
 
-ZSH_THEME="simple"
+# Theme: cccru.zsh-theme, next to this file in the repo (found through the
+# ~/.zshrc symlink), loaded after oh-my-zsh.
+ZSH_THEME=""
+_zsh_dots="${${(%):-%x}:A:h}"
 plugins=(git sudo z extract colored-man-pages command-not-found history-substring-search)
 
 if [[ -z "$IN_EMACS_TERM" ]]; then
   source $ZSH/oh-my-zsh.sh
+  [[ -r "$_zsh_dots/cccru.zsh-theme" ]] && source "$_zsh_dots/cccru.zsh-theme"
 fi
+unset _zsh_dots
 
 # aliases
 alias ll='eza -lha'
@@ -35,7 +40,7 @@ alias :q='exit'
 alias python='python3'
 alias cls='clear'
 alias cat='bat'
-export BAT_THEME="gruvbox-dark"
+export BAT_THEME="ansi"   # use the terminal (cccru) colours
 alias vi='hx'
 alias vim='hx'
 alias nvim='hx'

@@ -84,24 +84,24 @@ tmux_conf_24b_colour=true
 #   - tmux_conf_theme_root
 #   - tmux_conf_theme_synchronized
 tmux_conf_theme=enabled
-# Gruvbox Dark theme
-tmux_conf_theme_colour_1="#282828"    # bg0
-tmux_conf_theme_colour_2="#3c3836"    # bg1
-tmux_conf_theme_colour_3="#a89984"    # fg4
-tmux_conf_theme_colour_4="#8ec07c"    # aqua (accent / active border)
-tmux_conf_theme_colour_5="#fabd2f"    # yellow
-tmux_conf_theme_colour_6="#282828"    # bg0
-tmux_conf_theme_colour_7="#282828"    # bg0
-tmux_conf_theme_colour_8="#282828"    # bg0
-tmux_conf_theme_colour_9="#fabd2f"    # yellow
-tmux_conf_theme_colour_10="#fe8019"    # orange
-tmux_conf_theme_colour_11="#d3869b"    # purple
-tmux_conf_theme_colour_12="#a89984"    # fg4
-tmux_conf_theme_colour_13="#282828"    # bg0 (fg on red bg)
-tmux_conf_theme_colour_14="#282828"    # bg0 (fg on fg bg)
-tmux_conf_theme_colour_15="#32302f"    # bg0_s
-tmux_conf_theme_colour_16="#fb4934"    # red
-tmux_conf_theme_colour_17="#ebdbb2"    # fg
+# cccru theme (neon green on black, from cccru.ca)
+tmux_conf_theme_colour_1="#0b0b0b"    # status bar background
+tmux_conf_theme_colour_2="#1a2a1e"    # pane border, last-window background
+tmux_conf_theme_colour_3="#b7c9b7"    # status bar text (--muted)
+tmux_conf_theme_colour_4="#11ff7a"    # accent: active border, current window (--neon)
+tmux_conf_theme_colour_5="#afffd6"    # messages, copy mode
+tmux_conf_theme_colour_6="#0b0b0b"    # left: session (text)
+tmux_conf_theme_colour_7="#0b0b0b"    # left: uptime (text)
+tmux_conf_theme_colour_8="#e9efe9"    # left: third segment (text)
+tmux_conf_theme_colour_9="#11ff7a"    # left: session (bg, --neon)
+tmux_conf_theme_colour_10="#0bbf5b"   # left: uptime (bg, --neon-dim)
+tmux_conf_theme_colour_11="#2d732d"   # left: third segment (bg, --darkened)
+tmux_conf_theme_colour_12="#b7c9b7"   # right: battery/time (text)
+tmux_conf_theme_colour_13="#0b0b0b"   # right: user (text)
+tmux_conf_theme_colour_14="#0b0b0b"   # right: host (text)
+tmux_conf_theme_colour_15="#1a2a1e"   # right: battery/time (bg)
+tmux_conf_theme_colour_16="#0bbf5b"   # right: user (bg); synchronized panes border
+tmux_conf_theme_colour_17="#11ff7a"   # right: host (bg)
 # default theme
 # default theme (ansi)
 #tmux_conf_theme_colour_1="colour0"

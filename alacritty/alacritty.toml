@@ -1,5 +1,5 @@
 [general]
-import = ["~/.config/alacritty/gruvbox_dark.toml"]
+import = ["~/.config/alacritty/cccru.toml"]
 
 [window]
 dimensions = { columns = 204, lines = 54 }

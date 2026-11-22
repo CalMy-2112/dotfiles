@@ -1,0 +1,34 @@
+-- ~/.config/xmobar/xmobarrc  (colours from cccru.ca: neon green on black)
+-- xmobar 0.45+ (Ubuntu 23.04+) uses Pango font names like below.
+-- On Ubuntu 22.04 (xmobar 0.44) use: font = "xft:JetBrainsMono Nerd Font:bold:size=10"
+
+Config
+  { font             = "JetBrainsMono Nerd Font Bold 10"
+  , bgColor          = "#0b0b0b"
+  , fgColor          = "#e9efe9"
+  , border           = BottomB
+  , borderColor      = "#2d732d"
+  , position         = TopSize L 90 24     -- left 90% of the top edge; trayer has the rest
+  , lowerOnStart     = True
+  , hideOnStart      = False
+  , allDesktops      = True
+  , persistent       = True
+  , overrideRedirect = True
+  , commands =
+      [ Run XMonadLog
+      , Run Cpu      [ "-t", "cpu <total>%"
+                     , "-L", "30", "-H", "70"
+                     , "--normal", "#6fd495", "--high", "#11ff7a" ] 20
+      , Run Memory   [ "-t", "mem <usedratio>%"
+                     , "-H", "80", "--high", "#11ff7a" ] 20
+      , Run Battery  [ "-t", "<acstatus> <left>%"
+                     , "-L", "20", "--low", "#afffd6"
+                     , "--"
+                     , "-O", "chg", "-i", "full", "-o", "bat"
+                     ] 50
+      , Run Date     "%a %d %b  %H:%M" "date" 100
+      ]
+  , sepChar  = "%"
+  , alignSep = "}{"
+  , template = " %XMonadLog% }{ <fc=#b7c9b7>%cpu%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%memory%</fc>  <fc=#2d732d>|</fc>  <fc=#b7c9b7>%battery%</fc>  <fc=#2d732d>|</fc>  <fc=#11ff7a>%date%</fc> "
+  }

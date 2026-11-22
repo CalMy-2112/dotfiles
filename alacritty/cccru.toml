@@ -1,0 +1,63 @@
+# cccru: neon green on black, from cccru.ca's style.css
+# (--bg #0b0b0b, --ink #e9efe9, --muted #b7c9b7, --neon #11ff7a,
+#  --neon-dim #0bbf5b, --darkened #2d732d). The site has no red, yellow,
+# blue or violet, so those are muted extras that sit with the greens and
+# keep errors, diffs and ls output readable.
+
+[colors.primary]
+background = '#0b0b0b'
+foreground = '#e9efe9'
+dim_foreground = '#b7c9b7'
+bright_foreground = '#ffffff'
+
+[colors.cursor]
+text   = '#0b0b0b'
+cursor = '#11ff7a'
+
+[colors.vi_mode_cursor]
+text   = '#0b0b0b'
+cursor = '#afffd6'
+
+[colors.selection]
+text       = 'CellForeground'
+background = '#1f4a2c'
+
+[colors.search.matches]
+foreground = '#0b0b0b'
+background = '#6fd495'
+
+[colors.search.focused_match]
+foreground = '#0b0b0b'
+background = '#11ff7a'
+
+[colors.hints.start]
+foreground = '#0b0b0b'
+background = '#11ff7a'
+
+[colors.hints.end]
+foreground = '#0b0b0b'
+background = '#6fd495'
+
+[colors.footer_bar]
+foreground = '#e9efe9'
+background = '#2d732d'
+
+[colors.normal]
+black   = '#0b0b0b'
+red     = '#e05d5d'
+green   = '#0bbf5b'
+yellow  = '#b8d86b'
+blue    = '#4fa58a'
+magenta = '#a98fd8'
+cyan    = '#6fd495'
+white   = '#b7c9b7'
+
+[colors.bright]
+black   = '#4a5a4a'
+red     = '#ff6b6b'
+green   = '#11ff7a'
+yellow  = '#d7ff7a'
+blue    = '#6fd4b8'
+magenta = '#c3a6ff'
+cyan    = '#afffd6'
+white   = '#e9efe9'

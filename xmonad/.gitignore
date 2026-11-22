@@ -1,0 +1,7 @@
+# build output, in case xmonad writes it next to the config
+xmonad-*-linux
+xmonad.errors
+xmonad.state
+build/
+*.hi
+*.o

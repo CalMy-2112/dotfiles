@@ -28,9 +28,12 @@ run dunst
 [ -x /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ] &&
   /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 
-# Lock screen on suspend / Super+Ctrl+l, auto-lock after 10 min idle
-xset s 600 600
-run xss-lock --transfer-sleep-lock -- i3lock -n -c 0b0b0b
+# Lock screen: xscreensaver locks after 10 min idle, on suspend, and on
+# Super+Ctrl+l. Its helper (xscreensaver-systemd) keeps the screen on while
+# a browser plays video. Settings are in ~/.Xresources (x11/Xresources).
+# X's own blanking is turned off so it doesn't fight xscreensaver.
+xset s off
+run xscreensaver --no-splash
 
 # System tray: at the right end of the bar, like i3bar. i3's default tray
 # padding is 2px above, below and to the right, so in the 24px bar:

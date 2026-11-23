@@ -12,3 +12,52 @@ Xft.lcdfilter: lcddefault
 
 Xcursor.theme: Yaru
 Xcursor.size:  24
+
+! ---- xscreensaver (started by xmonad/autostart.sh) ----
+! Changes here need:  xrdb -merge ~/.Xresources && xscreensaver-command -restart
+! Anything saved from xscreensaver-settings goes to ~/.xscreensaver, which
+! overrides these. Delete that file to come back to these settings.
+
+! Lock at 10 min idle, monitor off at 15 min idle (both counted from the
+! last key press or mouse move). Random screensavers, changed every 10 min.
+XScreenSaver.timeout:       0:10:00
+XScreenSaver.lock:          True
+XScreenSaver.lockTimeout:   0:00:00
+XScreenSaver.mode:          random
+XScreenSaver.cycle:         0:10:00
+XScreenSaver.dpmsEnabled:   True
+XScreenSaver.dpmsStandby:   0:15:00
+XScreenSaver.dpmsSuspend:   0:15:00
+XScreenSaver.dpmsOff:       0:15:00
+XScreenSaver.splash:        False
+
+! Unlock box in the cccru palette (same colours as xmobar). XScreenSaver is the
+! class name, so these reach the unlock dialog process (xscreensaver-auth) too.
+XScreenSaver.themeNames:    Default, Borderless, Dark Gray, Borderless Black, \
+                            Green Black, White, Blue, Aqua Black, Wine, Cccru
+XScreenSaver.dialogTheme:   cccru
+XScreenSaver.dateFormat:    %a %d %b  %H:%M
+
+XScreenSaver*Dialog.headingFont:  JetBrainsMono Nerd Font bold 16
+XScreenSaver*Dialog.bodyFont:     JetBrainsMono Nerd Font 14
+XScreenSaver*Dialog.errorFont:    JetBrainsMono Nerd Font bold 14
+XScreenSaver*Dialog.labelFont:    JetBrainsMono Nerd Font bold 14
+XScreenSaver*Dialog.unameFont:    JetBrainsMono Nerd Font 12
+XScreenSaver*Dialog.buttonFont:   JetBrainsMono Nerd Font bold 14
+XScreenSaver*Dialog.dateFont:     JetBrainsMono Nerd Font 10
+
+XScreenSaver*cccru.Dialog.foreground:             #e9efe9
+XScreenSaver*cccru.Dialog.background:             #0b0b0b
+XScreenSaver*cccru.Dialog.topShadowColor:         #0b0b0b
+XScreenSaver*cccru.Dialog.bottomShadowColor:      #0b0b0b
+XScreenSaver*cccru.Dialog.shadowWidth:            1
+XScreenSaver*cccru.Dialog.text.foreground:        #afffd6
+XScreenSaver*cccru.Dialog.text.background:        #2d732d
+XScreenSaver*cccru.Dialog.error.foreground:       #ff6b6b
+XScreenSaver*cccru.Dialog.button.foreground:      #e9efe9
+XScreenSaver*cccru.Dialog.button.background:      #2d732d
+XScreenSaver*cccru.Dialog.logo.background:        #0b0b0b
+XScreenSaver*cccru.Dialog.thermometer.foreground: #0bbf5b
+XScreenSaver*cccru.Dialog.thermometer.background: #2d732d
+XScreenSaver*cccru.Dialog.borderColor:            #0bbf5b
+XScreenSaver*cccru.Dialog.borderWidth:            1

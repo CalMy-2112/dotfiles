@@ -29,7 +29,7 @@ myTerminal = "alacritty"
 myBrowser  = "firefox"
 myFiles    = "nautilus"
 myLauncher = "rofi -show drun -show-icons"
-myLocker   = "loginctl lock-session"   -- handled by xss-lock in autostart.sh
+myLocker   = "xscreensaver-command -lock"   -- xscreensaver starts in autostart.sh
 
 ------------------------------------------------------------------------
 -- Colours, from cccru.ca's style.css (neon green on black)

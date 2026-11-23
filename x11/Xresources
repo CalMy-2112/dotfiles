@@ -1,5 +1,5 @@
 ! ~/.Xresources: loaded by ~/.xinitrc (xrdb -merge) before xmonad starts.
-! Scale for the gram (2560x1600, 16"): 1x, same as GNOME at 100%.
+! Scale for the gram (2560x1600, 16-inch): 1x, same as GNOME at 100%.
 ! 96 = 1x, 120 = 1.25x, 144 = 1.5x, 192 = 2x.
 ! Alacritty, GTK apps, Qt apps and rofi read Xft.dpi. If you change it,
 ! also change Xcursor.size (24 per 1x) and the xmobar font/height.

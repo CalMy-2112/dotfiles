@@ -1,0 +1,68 @@
+/* ~/.config/rofi/config.rasi (symlink to rofi/config.rasi in the dots repo).
+ * Used by Super+p (drun) and Super+Shift+p (run).
+ * Colours: cccru, the same as xmonad.hs, xmobar and the lock screen.
+ * rofi's built-in theme takes all its colours from the variables below,
+ * so every row state (normal, selected, active, urgent) comes out dark. */
+
+configuration {
+  modi:                "drun,run";
+  show-icons:          true;
+  font:                "JetBrainsMono Nerd Font 11";
+  display-drun:        "apps";
+  display-run:         "run";
+  drun-display-format: "{name}";
+}
+
+* {
+  background:                  #0b0b0b;   /* --bg */
+  foreground:                  #e9efe9;   /* --ink */
+  lightbg:                     #0b0b0b;
+  lightfg:                     #2d732d;   /* --darkened */
+  red:                         #ff6b6b;
+  blue:                        #11ff7a;   /* --neon */
+  border-color:                #0bbf5b;   /* --neon-dim */
+  separatorcolor:              #2d732d;
+
+  normal-background:           #0b0b0b;
+  normal-foreground:           #e9efe9;
+  alternate-normal-background: #0b0b0b;
+  alternate-normal-foreground: #e9efe9;
+  selected-normal-background:  #2d732d;
+  selected-normal-foreground:  #afffd6;
+
+  active-background:           #0b0b0b;
+  active-foreground:           #11ff7a;
+  alternate-active-background: #0b0b0b;
+  alternate-active-foreground: #11ff7a;
+  selected-active-background:  #0bbf5b;
+  selected-active-foreground:  #0b0b0b;
+
+  urgent-background:           #0b0b0b;
+  urgent-foreground:           #ff6b6b;
+  alternate-urgent-background: #0b0b0b;
+  alternate-urgent-foreground: #ff6b6b;
+  selected-urgent-background:  #ff6b6b;
+  selected-urgent-foreground:  #0b0b0b;
+}
+
+window {
+  width:   640px;
+  border:  1px;
+  padding: 8px;
+}
+
+inputbar {
+  padding: 2px 2px 6px;
+}
+
+prompt {
+  text-color: #11ff7a;
+}
+
+listview {
+  lines: 12;
+}
+
+element {
+  padding: 3px 4px;
+}

@@ -21,6 +21,11 @@ export XDG_CURRENT_DESKTOP=xmonad
 export XCURSOR_SIZE=24            # keep in step with Xcursor.size in ~/.Xresources
 export XCURSOR_THEME=Yaru
 
+# Qt apps: take the theme, and the dark colours, from GTK (gtk/gtk-3.0).
+# Needs Qt's GTK plugin (Ubuntu: qt6-gtk-platformtheme). Without it Qt apps
+# stay light, nothing else breaks.
+export QT_QPA_PLATFORMTHEME=gtk3
+
 # DPI, fonts and cursor (see ~/.Xresources)
 [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
 
@@ -29,7 +34,7 @@ if [ -d /run/systemd/system ]; then
   # etc. find this display.
   dbus-update-activation-environment --systemd \
     DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XCURSOR_SIZE XCURSOR_THEME \
-    PATH XDG_DATA_DIRS
+    QT_QPA_PLATFORMTHEME PATH XDG_DATA_DIRS
   exec xmonad
 else
   # FreeBSD: no systemd, so start a session bus for this X session. It stops

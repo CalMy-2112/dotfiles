@@ -10,6 +10,13 @@ dots="$(dirname "$(dirname "$(readlink -f "$0")")")"
 # Normal mouse cursor instead of the X
 xsetroot -cursor_name left_ptr
 
+# Dark mode for libadwaita apps (Nautilus, Settings) and Firefox: they read
+# GNOME's color-scheme setting, not ~/.config/gtk-*/settings.ini. It is kept
+# in dconf; setting it every login keeps it in this repo. No-op if the GNOME
+# schemas aren't installed.
+command -v gsettings >/dev/null 2>&1 &&
+  gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null
+
 # Wallpaper from the repo's wallpapers/ folder
 wall="$dots/wallpapers/hyprland-girl.jpg"
 if [ -f "$wall" ]; then

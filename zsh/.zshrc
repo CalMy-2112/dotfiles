@@ -59,8 +59,10 @@ export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$GOPATH/bin:$HOME/.local/share/co
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 
 # zsh-autosuggestions and zsh-syntax-highlighting (syntax highlighting last).
+# Guix, then Debian/Ubuntu (/usr/share), then FreeBSD (/usr/local/share).
 for _plugin in zsh-autosuggestions zsh-syntax-highlighting; do
-  for _dir in "$HOME/.guix-home/profile/share/zsh/plugins/$_plugin" "/usr/share/$_plugin"; do
+  for _dir in "$HOME/.guix-home/profile/share/zsh/plugins/$_plugin" "/usr/share/$_plugin" \
+              "/usr/local/share/$_plugin"; do
     if [[ -r "$_dir/$_plugin.zsh" ]]; then
       source "$_dir/$_plugin.zsh"
       break

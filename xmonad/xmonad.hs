@@ -1,7 +1,9 @@
 -- ~/.config/xmonad/xmonad.hs
--- Targets xmonad / xmonad-contrib 0.17+ (Ubuntu 22.04 and newer).
+-- Targets xmonad / xmonad-contrib 0.17+ (Ubuntu 22.04 and newer, FreeBSD
+-- with the Hackage libraries, see xmonad/build).
 -- Mod key = Super. Reload with Super+q after editing.
 
+import           System.Info                     (os)
 import           XMonad
 import qualified XMonad.StackSet                 as W
 
@@ -30,6 +32,27 @@ myBrowser  = "firefox"
 myFiles    = "nautilus"
 myLauncher = "rofi -show drun -show-icons"
 myLocker   = "xscreensaver-command -lock"   -- xscreensaver starts in autostart.sh
+
+-- Volume and brightness: PipeWire and brightnessctl on Linux (the gram),
+-- mixer(8) and backlight(8) on FreeBSD (the Panasonic). On the Panasonic the
+-- Fn keys are ACPI events, not X keys: devd runs the same commands for them.
+-- These bindings are for keyboards that send the XF86 keys.
+onFreeBSD :: Bool
+onFreeBSD = os == "freebsd"
+
+volUp, volDown, volMute, micMute, brightUp, brightDown :: String
+volUp      | onFreeBSD = "mixer vol.volume=+5%"
+           | otherwise = "pactl set-sink-volume @DEFAULT_SINK@ +5%"
+volDown    | onFreeBSD = "mixer vol.volume=-5%"
+           | otherwise = "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+volMute    | onFreeBSD = "mixer vol.mute=toggle"
+           | otherwise = "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+micMute    | onFreeBSD = "mixer rec.mute=toggle"
+           | otherwise = "pactl set-source-mute @DEFAULT_SOURCE@ toggle"
+brightUp   | onFreeBSD = "backlight incr 5"
+           | otherwise = "brightnessctl set +5%"
+brightDown | onFreeBSD = "backlight decr 5"
+           | otherwise = "brightnessctl set 5%-"
 
 ------------------------------------------------------------------------
 -- Colours, from cccru.ca's style.css (neon green on black)
@@ -100,12 +123,12 @@ myKeys =
   , ("S-<Print>",    spawn "flameshot full")
 
   -- media keys
-  , ("<XF86AudioRaiseVolume>",  spawn "pactl set-sink-volume @DEFAULT_SINK@ +5%")
-  , ("<XF86AudioLowerVolume>",  spawn "pactl set-sink-volume @DEFAULT_SINK@ -5%")
-  , ("<XF86AudioMute>",         spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
-  , ("<XF86AudioMicMute>",      spawn "pactl set-source-mute @DEFAULT_SOURCE@ toggle")
-  , ("<XF86MonBrightnessUp>",   spawn "brightnessctl set +5%")
-  , ("<XF86MonBrightnessDown>", spawn "brightnessctl set 5%-")
+  , ("<XF86AudioRaiseVolume>",  spawn volUp)
+  , ("<XF86AudioLowerVolume>",  spawn volDown)
+  , ("<XF86AudioMute>",         spawn volMute)
+  , ("<XF86AudioMicMute>",      spawn micMute)
+  , ("<XF86MonBrightnessUp>",   spawn brightUp)
+  , ("<XF86MonBrightnessDown>", spawn brightDown)
   , ("<XF86AudioPlay>",         spawn "playerctl play-pause")
   , ("<XF86AudioNext>",         spawn "playerctl next")
   , ("<XF86AudioPrev>",         spawn "playerctl previous")

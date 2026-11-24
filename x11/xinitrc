@@ -1,11 +1,20 @@
 #!/bin/sh
 # ~/.xinitrc: run by "startx" from a text console (Ctrl+Alt+F3).
 # GDM 50 on Ubuntu 26.04 can't start X11 sessions, so this is how xmonad starts.
+# FreeBSD has no display manager here either: log in on the console, startx.
 
 # zsh doesn't read /etc/profile on a console login, so do it here. It adds
 # /snap/bin to PATH and the snap app folder to XDG_DATA_DIRS (Firefox in rofi).
 [ -r /etc/profile ] && . /etc/profile
 [ -r "$HOME/.profile" ] && . "$HOME/.profile"
+
+# FreeBSD: cabal installs xmonad into ~/.local/bin. xmonad's restart (Super+q)
+# runs "xmonad" from PATH, so it must be here, not only in .zshrc.
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
+export PATH
 
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=xmonad
@@ -15,9 +24,15 @@ export XCURSOR_THEME=Yaru
 # DPI, fonts and cursor (see ~/.Xresources)
 [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
 
-# Let the tray applets, notifications etc. find this display
-dbus-update-activation-environment --systemd \
-  DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XCURSOR_SIZE XCURSOR_THEME \
-  PATH XDG_DATA_DIRS
-
-exec xmonad
+if [ -d /run/systemd/system ]; then
+  # Ubuntu: systemd runs the session bus. Let the tray applets, notifications
+  # etc. find this display.
+  dbus-update-activation-environment --systemd \
+    DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XCURSOR_SIZE XCURSOR_THEME \
+    PATH XDG_DATA_DIRS
+  exec xmonad
+else
+  # FreeBSD: no systemd, so start a session bus for this X session. It stops
+  # when xmonad exits.
+  exec dbus-run-session -- xmonad
+fi

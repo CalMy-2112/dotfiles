@@ -1,12 +1,29 @@
 #!/bin/sh
 # xmonad runs this (from ~/.config/xmonad) instead of picking "ghc" from PATH.
-# Uses Ubuntu's GHC, because the apt xmonad/xmonad-contrib libraries are only
-# registered with it, not with ghcup's GHC (~/.ghcup/env is on PATH in zsh).
 # $1 is the path xmonad wants the compiled binary at.
 set -e
 out="$1"
-# -package-env - : ignore ~/.ghc/*/environments/default. "cabal install --lib"
-# (for helix's language server) writes one there for ghcup's GHC, and it would
-# make this GHC look for ghcup's packages and fail.
-exec /usr/bin/ghc -package-env - --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 \
-  -outputdir "$(dirname "$out")/build-$(uname -m)-linux" -o "$out"
+
+case "$(uname -s)" in
+FreeBSD)
+  # FreeBSD has no xmonad-contrib package, so the libraries come from Hackage
+  # into the GHC package environment "xmonad" (made once, see below). Only
+  # that environment is used, so other "cabal install --lib" runs can't
+  # break this build.
+  #   cabal update
+  #   cabal install --lib --package-env=xmonad xmonad xmonad-contrib
+  # -L/usr/local/lib: the X libraries are there, not in the base system.
+  exec ghc -package-env xmonad --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 \
+    -L/usr/local/lib -outputdir "$(dirname "$out")/build-$(uname -m)-freebsd" -o "$out"
+  ;;
+*)
+  # Ubuntu (the gram): Ubuntu's GHC, because the apt xmonad/xmonad-contrib
+  # libraries are only registered with it, not with ghcup's GHC
+  # (~/.ghcup/env is on PATH in zsh).
+  # -package-env - : ignore ~/.ghc/*/environments/default. "cabal install --lib"
+  # (for helix's language server) writes one there for ghcup's GHC, and it would
+  # make this GHC look for ghcup's packages and fail.
+  exec /usr/bin/ghc -package-env - --make xmonad.hs -i -ilib -fforce-recomp -main-is main -v0 \
+    -outputdir "$(dirname "$out")/build-$(uname -m)-linux" -o "$out"
+  ;;
+esac

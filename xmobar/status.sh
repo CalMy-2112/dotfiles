@@ -9,15 +9,21 @@
 # The loop runs every second; the time is redone every second, the other
 # items every 2 seconds, and disk on every 60th loop, as in Qubes' painter().
 # An item that can't be read is left out, as in Qubes.
+# On FreeBSD the items read other sources (see the block before the loop).
 
 # i3bar's default separator: a 9px block with a 1px vertical line, 4px from
 # its left edge, kept clear of the top and bottom of the bar.
 SEP='<hspace=4/><box type=Left width=1 mt=4 mb=4 color=#2d732d><hspace=5/></box>'
 
 status_disk() {
-  # Free space on / in binary units, cut down (not rounded) like Qubes' ">>".
   local free
   free=$(df -B1 --output=avail / 2>/dev/null | tail -n 1 | tr -d ' ') || return
+  disk_fmt "$free"
+}
+
+disk_fmt() {
+  # Free space ($1 bytes) in binary units, cut down (not rounded) like Qubes' ">>".
+  local free=$1
   [ -n "$free" ] || return
   if   (( free >= 1 << 40 )); then echo "Disk free: $(( free >> 40 ))T"
   elif (( free >= 1 << 30 )); then echo "Disk free: $(( free >> 30 ))G"
@@ -84,6 +90,61 @@ status_volume() {
       if (first_on == "") print "Volume: mute"; else print "Volume: " first_on
     }'
 }
+
+# FreeBSD (the Panasonic) has no /sys or /proc/net/wireless, no GNU df and
+# no PulseAudio, so these items read sysctl, ifconfig, wpa_cli and mixer.
+# Same output as above.
+if [ "$(uname -s)" = FreeBSD ]; then
+  status_disk() {
+    local kb
+    kb=$(df -Pk / 2>/dev/null | awk 'NR == 2 { print $4 }')
+    [ -n "$kb" ] && disk_fmt $(( kb * 1024 ))
+  }
+
+  status_wifi() {
+    # Linux's link quality is the signal in dBm, held to -110..-40, plus 110,
+    # out of 70. Here the signal is the access point's live signal-to-noise
+    # value from net80211 plus the noise floor from wpa_supplicant (or -95).
+    local wl snr noise dbm
+    wl=$(ifconfig -l | tr ' ' '\n' | grep -m 1 '^wlan')
+    if [ -z "$wl" ] || ! ifconfig "$wl" 2>/dev/null | grep -q 'status: associated'; then
+      echo "Wifi: off"; return
+    fi
+    snr=$(ifconfig "$wl" list sta 2>/dev/null | awk 'NR == 2 { print int($5) }')
+    [ -n "$snr" ] || { echo "Wifi: off"; return; }
+    noise=$(wpa_cli -i "$wl" bss current 2>/dev/null | sed -n 's/^noise=//p')
+    [[ "$noise" =~ ^-[0-9]+$ ]] || noise=-95
+    dbm=$(( snr + noise ))
+    (( dbm < -110 )) && dbm=-110
+    (( dbm > -40 )) && dbm=-40
+    echo "Wifi: $(( (dbm + 110) * 100 / 70 ))%"
+  }
+
+  status_bat() {
+    # hw.acpi.battery.life: all batteries together, -1 when there is none.
+    local pct ac=""
+    pct=$(sysctl -n hw.acpi.battery.life 2>/dev/null)
+    [[ "$pct" =~ ^[0-9]+$ ]] || return
+    [ "$(sysctl -n hw.acpi.acline 2>/dev/null)" = 1 ] && ac=" AC"
+    echo "Bat: ${pct}%${ac}"
+  }
+
+  status_load() {
+    # vm.loadavg looks like "{ 0.52 0.48 0.40 }"
+    sysctl -n vm.loadavg 2>/dev/null | awk '{ print "Load: " $2 }'
+  }
+
+  status_volume() {
+    # "mixer vol.volume vol.mute" prints vol.volume=0.40:0.40 and vol.mute=off
+    mixer vol.volume vol.mute 2>/dev/null | awk -F '[=:]' '
+      $1 == "vol.volume" { v = int($2 * 100 + 0.5); have = 1 }
+      $1 == "vol.mute"   { m = $2 }
+      END {
+        if (!have) exit
+        if (m == "on") print "Volume: mute"; else print "Volume: " v
+      }'
+  }
+fi
 
 loop_count=0
 disk_status=""

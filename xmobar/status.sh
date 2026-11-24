@@ -105,13 +105,18 @@ if [ "$(uname -s)" = FreeBSD ]; then
     # Linux's link quality is the signal in dBm, held to -110..-40, plus 110,
     # out of 70. Here the signal is the access point's live signal-to-noise
     # value from net80211 plus the noise floor from wpa_supplicant (or -95).
-    local wl snr noise dbm
+    # The Panasonic's iwm(4) driver reports no usable signal (RSSI 0.5, level
+    # = its fixed -96 dBm noise while the link runs at 36M), so for a signal
+    # of 1 dB or less this shows the link rate instead, e.g. "Wifi: 36M".
+    local wl sta snr rate noise dbm
     wl=$(ifconfig -l | tr ' ' '\n' | grep -m 1 '^wlan')
     if [ -z "$wl" ] || ! ifconfig "$wl" 2>/dev/null | grep -q 'status: associated'; then
       echo "Wifi: off"; return
     fi
-    snr=$(ifconfig "$wl" list sta 2>/dev/null | awk 'NR == 2 { print int($5) }')
+    sta=$(ifconfig "$wl" list sta 2>/dev/null | awk 'NR == 2 { print int($5), $4 }')
+    read -r snr rate <<<"$sta"
     [ -n "$snr" ] || { echo "Wifi: off"; return; }
+    if (( snr <= 1 )); then echo "Wifi: $rate"; return; fi
     noise=$(wpa_cli -i "$wl" bss current 2>/dev/null | sed -n 's/^noise=//p')
     [[ "$noise" =~ ^-[0-9]+$ ]] || noise=-95
     dbm=$(( snr + noise ))

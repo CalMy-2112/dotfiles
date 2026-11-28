@@ -54,13 +54,6 @@ alias vm='tmux has -t vm 2>/dev/null || tmux new -d -s vm ~/vm/run.sh'
 clear
 fastfetch
 
-export EDITOR="nvim"
-export CARGO_MOMMYS_MOODS="ominous/thirsty/yikes"
-export GTK_THEME=Adwaita:dark
-export SAL_USE_VCLPLUGIN=gtk3
-export GOPATH=$HOME/go
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$GOPATH/bin:$HOME/.local/share/coursier/bin:$PATH"
-[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
 # opam's switch (OCaml, dune, merlin...) on PATH. On Alpine all OCaml tools
 # come from opam, none from apk.
 [[ -r "$HOME/.opam/opam-init/init.zsh" ]] && source "$HOME/.opam/opam-init/init.zsh" >/dev/null 2>&1

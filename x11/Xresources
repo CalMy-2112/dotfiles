@@ -10,6 +10,7 @@ Xft.hintstyle: hintslight
 Xft.rgba:      rgb
 Xft.lcdfilter: lcddefault
 
+! ~/.xinitrc replaces this with Adwaita where Yaru isn't installed (Alpine).
 Xcursor.theme: Yaru
 Xcursor.size:  24
 

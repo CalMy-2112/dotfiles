@@ -17,6 +17,10 @@ if [[ "$INSIDE_EMACS" == *"term:"* ]]; then
 fi
 
 # Oh My Zsh
+# Alpine's apk oh-my-zsh is in /usr/share/oh-my-zsh (read-only, like Guix's).
+if [[ -z "$ZSH" && ! -d "$HOME/.oh-my-zsh" && -d /usr/share/oh-my-zsh ]]; then
+  ZSH=/usr/share/oh-my-zsh
+fi
 export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
 ZSH_CACHE_DIR="$HOME/.cache/oh-my-zsh"
 [[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
@@ -57,12 +61,16 @@ export SAL_USE_VCLPLUGIN=gtk3
 export GOPATH=$HOME/go
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$GOPATH/bin:$HOME/.local/share/coursier/bin:$PATH"
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
+# opam's switch (OCaml, dune, merlin...) on PATH. On Alpine all OCaml tools
+# come from opam, none from apk.
+[[ -r "$HOME/.opam/opam-init/init.zsh" ]] && source "$HOME/.opam/opam-init/init.zsh" >/dev/null 2>&1
 
 # zsh-autosuggestions and zsh-syntax-highlighting (syntax highlighting last).
-# Guix, then Debian/Ubuntu (/usr/share), then FreeBSD (/usr/local/share).
+# Guix, then Debian/Ubuntu (/usr/share), then Alpine (/usr/share/zsh/plugins),
+# then FreeBSD (/usr/local/share).
 for _plugin in zsh-autosuggestions zsh-syntax-highlighting; do
   for _dir in "$HOME/.guix-home/profile/share/zsh/plugins/$_plugin" "/usr/share/$_plugin" \
-              "/usr/local/share/$_plugin"; do
+              "/usr/share/zsh/plugins/$_plugin" "/usr/local/share/$_plugin"; do
     if [[ -r "$_dir/$_plugin.zsh" ]]; then
       source "$_dir/$_plugin.zsh"
       break

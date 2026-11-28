@@ -1,19 +1,21 @@
 #!/bin/bash
-# Install the host part of the Claude VM on Ubuntu.
+# Install the host part of the Claude VM on Ubuntu (systemd) or Alpine
+# (OpenRC).
 #
-#   sudo ./install-host.sh
+#   sudo ./install-host.sh      (Alpine: doas ./install-host.sh)
 #
 # Run it again after you change vm.conf, qemu.sh, powerdown.sh or
 # claude-vm.service, or when /etc/resolv.conf gets a new nameserver.
 #
 # What it does:
-#   - installs QEMU, qemu-img, cloud-localds, nft and socat
+#   - installs QEMU, qemu-img, cloud-localds (Alpine: xorriso), nft and socat
 #   - makes the system user "claudevm". QEMU runs as this user, not as you,
 #     so a QEMU escape does not land in your home folder.
 #   - writes a host firewall table for that user: no connections to
 #     loopback, LAN, Tailscale or link-local addresses (DNS to your
 #     resolver is the only exception). The guest cannot change this rule.
-#   - installs qemu.sh, powerdown.sh and claude-vm.service
+#   - installs qemu.sh, powerdown.sh and claude-vm.service (Ubuntu) or the
+#     OpenRC script claude-vm.openrc as /etc/init.d/claude-vm (Alpine)
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -23,26 +25,36 @@ LIB=/usr/local/lib/claude-vm
 ETC=/etc/claude-vm
 
 die() { echo "install-host.sh: $*" >&2; exit 1; }
+alpine() { [ -f /etc/alpine-release ]; }
 
-[ "$(id -u)" -eq 0 ] || die "run with sudo: sudo $0"
+[ "$(id -u)" -eq 0 ] || die "run as root: sudo $0 (Alpine: doas $0)"
 [ -e /dev/kvm ] || die "/dev/kvm is missing. Turn on VT-x in the firmware setup, then check: ls -l /dev/kvm"
 
 echo "== packages"
-apt-get update -qq || echo "WARNING: apt-get update failed; trying the install anyway"
-apt-get install -y qemu-system-x86 qemu-utils cloud-image-utils nftables socat curl
+if alpine; then
+  # shadow: useradd/usermod; coreutils: GNU sha512sum (make-vm.sh);
+  # bash, python3, ssh-keygen: make-vm.sh and provision.sh
+  # xorriso, not cloud-utils-localds: its cdrkit conflicts with virt-install.
+  apk add qemu-system-x86_64 qemu-img xorriso nftables socat curl \
+    shadow coreutils bash python3 openssh-client-default
+else
+  apt-get update -qq || echo "WARNING: apt-get update failed; trying the install anyway"
+  apt-get install -y qemu-system-x86 qemu-utils cloud-image-utils nftables socat curl
+fi
 
 echo "== user $VM_USER"
 if ! id "$VM_USER" >/dev/null 2>&1; then
   useradd --system --home-dir "$STATE" --no-create-home \
-    --shell /usr/sbin/nologin "$VM_USER"
+    --shell "$(command -v nologin || echo /usr/sbin/nologin)" "$VM_USER"
 fi
 getent group kvm >/dev/null || die "there is no group kvm (ls -l /dev/kvm shows the group)"
 usermod -aG kvm "$VM_USER"
 install -d -o "$VM_USER" -g "$VM_USER" -m 0700 "$STATE"
 
 # The VM user must not be able to read your home folder.
-if [ -n "${SUDO_USER:-}" ]; then
-  home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+me=${SUDO_USER:-${DOAS_USER:-}}
+if [ -n "$me" ]; then
+  home=$(getent passwd "$me" | cut -d: -f6)
   mode=$(stat -c %a "$home")
   case $mode in
     *[1-7]) echo "WARNING: $home is readable by other users (mode $mode)."
@@ -63,8 +75,9 @@ fi
 echo "== host firewall for $VM_USER ($ETC/claudevm.nft)"
 # QEMU's user network sends the guest's DNS queries (to 10.0.2.3) to the
 # first IPv4 nameserver in the host's /etc/resolv.conf. On Ubuntu that is
-# usually systemd-resolved at 127.0.0.53, which the rule below would block,
-# so allow port 53 to each IPv4 nameserver, and nothing else.
+# usually systemd-resolved at 127.0.0.53 (on Alpine, whatever NetworkManager
+# wrote), which the rule below could block, so allow port 53 to each IPv4
+# nameserver, and nothing else.
 dns_rules=""
 while read -r key ns _; do
   [ "$key" = nameserver ] || continue
@@ -102,8 +115,12 @@ echo "== scripts and service"
 install -d -m 0755 "$LIB"
 install -m 0755 "$here/qemu.sh" "$LIB/qemu.sh"
 install -m 0755 "$here/powerdown.sh" "$LIB/powerdown.sh"
-install -m 0644 "$here/claude-vm.service" /etc/systemd/system/claude-vm.service
-systemctl daemon-reload
+if alpine; then
+  install -m 0755 "$here/claude-vm.openrc" /etc/init.d/claude-vm
+else
+  install -m 0644 "$here/claude-vm.service" /etc/systemd/system/claude-vm.service
+  systemctl daemon-reload
+fi
 
 echo
 echo "Done. Next, as your normal user (not with sudo):  ./make-vm.sh"

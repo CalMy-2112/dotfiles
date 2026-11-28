@@ -10,6 +10,14 @@ dots="$(dirname "$(dirname "$(readlink -f "$0")")")"
 # Normal mouse cursor instead of the X
 xsetroot -cursor_name left_ptr
 
+# Sound: on Ubuntu systemd starts PipeWire for the user. Alpine has no
+# systemd, so start it here (pipewire, wireplumber and pipewire-pulse).
+# It needs XDG_RUNTIME_DIR, which ~/.xinitrc makes sure of.
+if [ ! -d /run/systemd/system ] && [ -x /usr/libexec/pipewire-launcher ] &&
+   ! pgrep -u "$(id -u)" -x pipewire >/dev/null; then
+  /usr/libexec/pipewire-launcher &
+fi
+
 # Dark mode for libadwaita apps (Nautilus, Settings) and Firefox: they read
 # GNOME's color-scheme setting, not ~/.config/gtk-*/settings.ini. It is kept
 # in dconf; setting it every login keeps it in this repo. No-op if the GNOME
@@ -32,8 +40,9 @@ run picom --backend glx --vsync
 run dunst
 
 # Password prompts for apps that need root (software updater, etc.)
-# The path is Ubuntu's, then FreeBSD's.
+# The path is Ubuntu's, then Alpine's, then FreeBSD's.
 for agent in /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 \
+             /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 \
              /usr/local/libexec/polkit-gnome-authentication-agent-1; do
   [ -x "$agent" ] && { "$agent" & break; }
 done
@@ -45,13 +54,14 @@ done
 xset s off
 run xscreensaver --no-splash
 
-# FreeBSD has no xscreensaver-systemd. Do its video part here: while a
-# browser or video player plays, tell xscreensaver every 50 s that the user
-# is active (its manual gives "--deactivate" for this). Not while the screen
-# is blanked or locked, because then it opens the unlock dialog. Music
-# players don't count, as with xscreensaver-systemd.
-# Locking before suspend is a root job on FreeBSD (/etc/rc.suspend).
-if [ "$(uname -s)" = FreeBSD ] && command -v playerctl >/dev/null 2>&1; then
+# Without systemd (FreeBSD, Alpine) there is no xscreensaver-systemd. Do its
+# video part here: while a browser or video player plays, tell xscreensaver
+# every 50 s that the user is active (its manual gives "--deactivate" for
+# this). Not while the screen is blanked or locked, because then it opens
+# the unlock dialog. Music players don't count, as with xscreensaver-systemd.
+# Locking before suspend is a root job: /etc/rc.suspend on FreeBSD, an
+# elogind system-sleep hook on Alpine.
+if [ ! -d /run/systemd/system ] && command -v playerctl >/dev/null 2>&1; then
   (
     while sleep 50; do
       xscreensaver-command -time 2>/dev/null | grep -q 'non-blanked' || continue

@@ -30,6 +30,15 @@ SSHCONF=$HOME/.ssh/claude-vm.conf
 die() { echo "make-vm.sh: $*" >&2; exit 1; }
 step() { echo; echo "== $*"; }
 as_vm() { (cd / && sudo -u claudevm "$@"); }
+# The service: systemd (Ubuntu) or OpenRC (Alpine, /etc/init.d/claude-vm).
+# On Alpine "sudo" is the doas shim (doas-sudo-shim).
+if [ -d /run/systemd/system ]; then
+  running() { systemctl is-active --quiet claude-vm; }
+  svc() { sudo systemctl "$1" claude-vm; }
+else
+  running() { rc-service claude-vm status >/dev/null 2>&1; }
+  svc() { sudo rc-service claude-vm "$1"; }
+fi
 
 [ "$(id -u)" -ne 0 ] || die "run as your normal user, not with sudo"
 [ -r /etc/claude-vm/vm.conf ] || die "run 'sudo ./install-host.sh' first"
@@ -41,8 +50,8 @@ PRIVKEY=${PUBKEY%.pub}
 if sudo test -e "$STATE/disk.qcow2"; then
   die "the VM disk exists already. To make a new VM, first run: claude-vm destroy"
 fi
-if systemctl is-active --quiet claude-vm; then
-  die "claude-vm.service is running; stop it first: claude-vm stop"
+if running; then
+  die "the claude-vm service is running; stop it first: claude-vm stop"
 fi
 
 step "1. Debian 13 cloud image"
@@ -90,7 +99,15 @@ cat > "$tmp/meta-data" <<EOF
 instance-id: claude-vm-$(date +%Y%m%d-%H%M%S)
 local-hostname: claude-vm
 EOF
-cloud-localds "$tmp/seed.img" "$tmp/user-data" "$tmp/meta-data"
+# The NoCloud seed: an ISO labelled "cidata" with user-data and meta-data.
+# Alpine can't have cloud-localds (cdrkit) next to virt-install (xorriso),
+# so there xorriso makes the same ISO.
+if command -v cloud-localds >/dev/null 2>&1; then
+  cloud-localds "$tmp/seed.img" "$tmp/user-data" "$tmp/meta-data"
+else
+  xorriso -as mkisofs -quiet -output "$tmp/seed.img" -volid cidata -joliet -rock \
+    "$tmp/user-data" "$tmp/meta-data"
+fi
 
 step "3. disk ($DISK)"
 sudo install -o claudevm -g claudevm -m 0600 "$CACHE/$IMG" "$STATE/disk.qcow2"
@@ -164,5 +181,5 @@ ln -sfn "$here/claude-vm" "$HOME/.local/bin/claude-vm"
 echo "control command: claude-vm (in ~/.local/bin)"
 
 step "6. start the VM and provision it"
-sudo systemctl start claude-vm
+svc start
 "$here/provision.sh"

@@ -8,7 +8,7 @@ DISK=$STATE/disk.qcow2
 usage() {
   cat <<'EOF'
 usage: claude-vm COMMAND
-  start            start the VM (systemd service claude-vm)
+  start            start the VM (service claude-vm: systemd or OpenRC)
   stop             shut the VM down (ACPI power button, then wait)
   status           service status
   ssh [cmd]        ssh as dev (the Claude user)
@@ -22,7 +22,15 @@ usage: claude-vm COMMAND
 EOF
 }
 
-running() { systemctl is-active --quiet claude-vm; }
+# The service: systemd (Ubuntu) or OpenRC (Alpine, /etc/init.d/claude-vm).
+# On Alpine "sudo" is the doas shim (doas-sudo-shim).
+if [ -d /run/systemd/system ]; then
+  running() { systemctl is-active --quiet claude-vm; }
+  svc() { sudo systemctl "$1" claude-vm; }
+else
+  running() { rc-service claude-vm status >/dev/null 2>&1; }
+  svc() { sudo rc-service claude-vm "$1"; }
+fi
 need_stopped() {
   if running; then
     echo "The VM is running. Stop it first: claude-vm stop" >&2
@@ -36,14 +44,18 @@ cmd=${1:-help}
 
 case $cmd in
   start)
-    sudo systemctl start claude-vm
+    svc start
     echo "started. ssh claude-vm (it can take about 20 s until ssh answers)"
     ;;
   stop)
-    sudo systemctl stop claude-vm
+    svc stop
     ;;
   status)
-    systemctl status claude-vm --no-pager || true
+    if [ -d /run/systemd/system ]; then
+      systemctl status claude-vm --no-pager || true
+    else
+      rc-service claude-vm status || true
+    fi
     ;;
   ssh)
     exec ssh claude-vm "$@"

@@ -1,4 +1,4 @@
-# Claude VM (Ubuntu host, Debian 13 + Nix guest)
+# Claude VM (Ubuntu or Alpine host, Debian 13 + Nix guest)
 
 A local QEMU/KVM VM for Claude Code with no access to the host. It is the
 same idea as the Guix VM (6 Nov 2026), with these changes:
@@ -13,16 +13,18 @@ same idea as the Guix VM (6 Nov 2026), with these changes:
   question on the first connection.
 - Nix is a single-user install owned by `dev`. There is no root nix-daemon.
   (Debian's own Nix package, 2.26.3, has open bugs where daemon users get root.)
-- The VM runs as a systemd service. Start and stop it with `claude-vm`.
+- The VM runs as a service: systemd on Ubuntu, OpenRC on Alpine. Start and
+  stop it with `claude-vm`.
 
 ## Files
 
 | File | Where it goes | What it does |
 |---|---|---|
-| `install-host.sh` | run with sudo | packages, user `claudevm`, firewall, service |
+| `install-host.sh` | run with sudo (Alpine: doas) | packages, user `claudevm`, firewall, service |
 | `vm.conf` | `/etc/claude-vm/vm.conf` | CPUS, MEM, DISK, PORT |
 | `qemu.sh`, `powerdown.sh` | `/usr/local/lib/claude-vm/` | start and stop QEMU |
-| `claude-vm.service` | `/etc/systemd/system/` | the service |
+| `claude-vm.service` | `/etc/systemd/system/` | the service (Ubuntu) |
+| `claude-vm.openrc` | `/etc/init.d/claude-vm` | the service (Alpine) |
 | `make-vm.sh` | run as you | image, seed, first boot, ssh settings |
 | `user-data.yaml` | in the seed | cloud-init: users, sshd, ufw, packages |
 | `provision.sh` | run as you | checks, Nix, home-manager, Claude Code, `~/work` |
@@ -98,11 +100,24 @@ Go back to the clean state: `claude-vm stop && claude-vm restore base`.
 - First boot ends without the line "CLAUDE-VM: first boot setup done":
   `make-vm.sh` stops and shows the end of `first-boot.log`. If the guest
   restarts right after GRUB, run `./boot-test.sh` to compare QEMU options.
-- The service does not start: `journalctl -u claude-vm -b`. If a line under
-  "Extra limits" in `claude-vm.service` is the cause, remove it, then run
+- The service does not start: `journalctl -u claude-vm -b` (Alpine:
+  `doas cat /var/log/claude-vm.log`). If a line under "Extra limits" in
+  `claude-vm.service` is the cause, remove it, then run
   `sudo ./install-host.sh` again.
 - No ssh: `claude-vm console` shows the boot messages.
 - DNS in the VM stops working after a network change: run
   `sudo ./install-host.sh` again. It reads the host's nameservers from
   `/etc/resolv.conf`.
 - Start over: `claude-vm stop`, `claude-vm destroy`, `./make-vm.sh`.
+
+## Alpine (OpenRC)
+
+`install-host.sh` sees `/etc/alpine-release` and installs the Alpine
+packages and `claude-vm.openrc` as `/etc/init.d/claude-vm`. `sudo` in these
+scripts is the doas shim (`doas-sudo-shim`). Everything else is the same.
+
+OpenRC has no equivalent of most of the systemd "Extra limits". On Alpine the
+VM keeps: QEMU as `claudevm`, `no_new_privs`, umask 077, QEMU's seccomp
+sandbox and the nft rule. It loses ProtectSystem, ProtectHome, PrivateTmp,
+DeviceAllow and the other Protect/Restrict options. Keep your home folder at
+mode 750 (install-host.sh warns if it is not), since ProtectHome is gone.

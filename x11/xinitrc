@@ -1,15 +1,18 @@
 #!/bin/sh
 # ~/.xinitrc: run by "startx" from a text console (Ctrl+Alt+F3).
 # GDM 50 on Ubuntu 26.04 can't start X11 sessions, so this is how xmonad starts.
-# FreeBSD has no display manager here either: log in on the console, startx.
+# FreeBSD and Alpine have no display manager here either: log in on the
+# console, startx.
 
 # zsh doesn't read /etc/profile on a console login, so do it here. It adds
-# /snap/bin to PATH and the snap app folder to XDG_DATA_DIRS (Firefox in rofi).
+# /snap/bin (Ubuntu) or the Flatpak app folders (Alpine) to PATH and
+# XDG_DATA_DIRS, so rofi lists those apps.
 [ -r /etc/profile ] && . /etc/profile
 [ -r "$HOME/.profile" ] && . "$HOME/.profile"
 
-# FreeBSD: cabal installs xmonad into ~/.local/bin. xmonad's restart (Super+q)
-# runs "xmonad" from PATH, so it must be here, not only in .zshrc.
+# FreeBSD and Alpine: cabal installs xmonad into ~/.local/bin. xmonad's
+# restart (Super+q) runs "xmonad" from PATH, so it must be here, not only
+# in .zshrc.
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
   *) PATH="$HOME/.local/bin:$PATH" ;;
@@ -19,15 +22,36 @@ export PATH
 export XDG_SESSION_TYPE=x11
 export XDG_CURRENT_DESKTOP=xmonad
 export XCURSOR_SIZE=24            # keep in step with Xcursor.size in ~/.Xresources
-export XCURSOR_THEME=Yaru
+# Yaru where it is installed (Ubuntu), else Adwaita (Alpine: adwaita-icon-theme).
+if [ -d /usr/share/icons/Yaru/cursors ]; then
+  export XCURSOR_THEME=Yaru
+else
+  export XCURSOR_THEME=Adwaita
+fi
+
+# PipeWire, dbus and other per-user services need XDG_RUNTIME_DIR. On Ubuntu
+# systemd sets it, on Alpine elogind does (through PAM at login). If neither
+# did, make a private one rather than run without it.
+if [ -z "$XDG_RUNTIME_DIR" ] && [ "$(uname -s)" = Linux ]; then
+  XDG_RUNTIME_DIR="${TMPDIR:-/tmp}/$(id -u)-runtime-dir"
+  mkdir -p "$XDG_RUNTIME_DIR" && chmod 0700 "$XDG_RUNTIME_DIR"
+  export XDG_RUNTIME_DIR
+fi
 
 # Qt apps: take the theme, and the dark colours, from GTK (gtk/gtk-3.0).
-# Needs Qt's GTK plugin (Ubuntu: qt6-gtk-platformtheme). Without it Qt apps
-# stay light, nothing else breaks.
-export QT_QPA_PLATFORMTHEME=gtk3
+# Needs Qt's GTK plugin (Ubuntu: qt6-gtk-platformtheme). Alpine has no such
+# plugin, so there Qt apps use the Adwaita-Dark style (adwaita-qt6) instead.
+# Without either, Qt apps stay light, nothing else breaks.
+if [ -f /etc/alpine-release ]; then
+  export QT_STYLE_OVERRIDE=Adwaita-Dark
+else
+  export QT_QPA_PLATFORMTHEME=gtk3
+fi
 
-# DPI, fonts and cursor (see ~/.Xresources)
+# DPI, fonts and cursor (see ~/.Xresources). The cursor theme chosen above
+# replaces the one in ~/.Xresources.
 [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
+echo "Xcursor.theme: $XCURSOR_THEME" | xrdb -merge
 
 if [ -d /run/systemd/system ]; then
   # Ubuntu: systemd runs the session bus. Let the tray applets, notifications
@@ -37,7 +61,7 @@ if [ -d /run/systemd/system ]; then
     QT_QPA_PLATFORMTHEME PATH XDG_DATA_DIRS
   exec xmonad
 else
-  # FreeBSD: no systemd, so start a session bus for this X session. It stops
-  # when xmonad exits.
+  # FreeBSD and Alpine: no systemd, so start a session bus for this X
+  # session. It stops when xmonad exits.
   exec dbus-run-session -- xmonad
 fi

@@ -1,0 +1,43 @@
+#!/sbin/openrc-run
+# OpenRC version of claude-vm.service, for Alpine. install-host.sh copies it
+# to /etc/init.d/claude-vm. Start and stop it with the claude-vm command.
+#
+# Compared with claude-vm.service, OpenRC has no ProtectSystem, ProtectHome,
+# PrivateTmp, DevicePolicy/DeviceAllow, Protect{Kernel*,ControlGroups,Clock,
+# Hostname}, Restrict{Namespaces,Realtime,SUIDSGID,AddressFamilies} or
+# LockPersonality. What is left: QEMU runs as claudevm (no access to your
+# home if it is mode 750), with no new privileges and umask 077, inside
+# QEMU's own seccomp sandbox (-sandbox in qemu.sh), behind the nft rule.
+
+description="Claude Code VM (QEMU as the user claudevm)"
+
+command=/usr/local/lib/claude-vm/qemu.sh
+command_args=service
+command_user=claudevm:claudevm
+command_background=yes
+pidfile=/run/claude-vm.pid
+no_new_privs=yes
+umask=0077
+output_log=/var/log/claude-vm.log
+error_log=/var/log/claude-vm.log
+
+depend() {
+	need net
+	after firewall
+}
+
+start_pre() {
+	checkpath -d -o claudevm:claudevm -m 0700 /run/claude-vm
+	checkpath -f -o claudevm:claudevm -m 0600 /var/log/claude-vm.log
+	# Load the host firewall for claudevm first. If this fails, the VM
+	# does not start.
+	/usr/sbin/nft -f /etc/claude-vm/claudevm.nft
+}
+
+stop() {
+	ebegin "Stopping claude-vm (ACPI power button, up to 90 s)"
+	# powerdown.sh waits for MAINPID to stop; then make sure it has.
+	MAINPID=$(cat "$pidfile" 2>/dev/null) /usr/local/lib/claude-vm/powerdown.sh
+	start-stop-daemon --stop --pidfile "$pidfile" --retry TERM/20/KILL/5
+	eend $?
+}

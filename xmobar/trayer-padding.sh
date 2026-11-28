@@ -4,3 +4,6 @@
 width=$(xprop -name panel 2>/dev/null |
   sed -n 's/.*program specified minimum size: \([0-9]*\) by.*/\1/p')
 [ -n "$width" ] && echo "<hspace=$((width + 2))/>"
+# Exit 0 even when trayer isn't up (yet): on an error xmobar shows
+# "Could not execute command" in the bar.
+exit 0

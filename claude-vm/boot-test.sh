@@ -12,12 +12,21 @@ WORK=$STATE/boot-test
 T=${T:-30}
 
 as_vm() { (cd / && sudo -u claudevm "$@"); }
+# The service: systemd (Ubuntu) or OpenRC (Alpine, /etc/init.d/claude-vm).
+# On Alpine "sudo" is the doas shim (doas-sudo-shim).
+if [ -d /run/systemd/system ]; then
+  running() { systemctl is-active --quiet claude-vm; }
+  svc() { sudo systemctl "$1" claude-vm; }
+else
+  running() { rc-service claude-vm status >/dev/null 2>&1; }
+  svc() { sudo rc-service claude-vm "$1"; }
+fi
 
 [ "$(id -u)" -ne 0 ] || { echo "run as your normal user, not with sudo" >&2; exit 1; }
 sudo test -f "$STATE/disk.qcow2" || { echo "no $STATE/disk.qcow2" >&2; exit 1; }
-if systemctl is-active --quiet claude-vm; then
+if running; then
   echo "stopping claude-vm.service"
-  sudo systemctl stop claude-vm
+  svc stop
 fi
 
 echo "== host"

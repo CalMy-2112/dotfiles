@@ -16,9 +16,10 @@
 SEP='<hspace=4/><box type=Left width=1 mt=4 mb=4 color=#2d732d><hspace=5/></box>'
 
 status_disk() {
-  local free
-  free=$(df -B1 --output=avail / 2>/dev/null | tail -n 1 | tr -d ' ') || return
-  disk_fmt "$free"
+  # POSIX df -P: GNU (Ubuntu), busybox (Alpine) and FreeBSD all print it.
+  local kb
+  kb=$(df -Pk / 2>/dev/null | awk 'NR == 2 { print $4 }')
+  [ -n "$kb" ] && disk_fmt $(( kb * 1024 ))
 }
 
 disk_fmt() {
@@ -91,16 +92,10 @@ status_volume() {
     }'
 }
 
-# FreeBSD (the Panasonic) has no /sys or /proc/net/wireless, no GNU df and
-# no PulseAudio, so these items read sysctl, ifconfig, wpa_cli and mixer.
+# FreeBSD (the Panasonic) has no /sys or /proc/net/wireless and no
+# PulseAudio, so these items read sysctl, ifconfig, wpa_cli and mixer.
 # Same output as above.
 if [ "$(uname -s)" = FreeBSD ]; then
-  status_disk() {
-    local kb
-    kb=$(df -Pk / 2>/dev/null | awk 'NR == 2 { print $4 }')
-    [ -n "$kb" ] && disk_fmt $(( kb * 1024 ))
-  }
-
   status_wifi() {
     # Linux's link quality is the signal in dBm, held to -110..-40, plus 110,
     # out of 70. Here the signal is the access point's live signal-to-noise
